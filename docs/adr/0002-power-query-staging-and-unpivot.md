@@ -11,7 +11,7 @@ The budget workbook is made for people: a title, a note and an empty row above t
 - Three parameters in `expressions.tmdl`: `DataFolder` (with the trailing backslash), `StartDate` and `EndDate`.
 - One staging query per file, also in `expressions.tmdl` and not loaded: `src_GL`, `src_Budget`, `src_Accounts`, `src_CostCentres`, `src_Layout`, `src_Security`. Each touches exactly one file through `DataFolder`.
 - `src_Budget` takes every sheet of the workbook, skips the three rows above the header, promotes the header, keeps the rows whose cost centre starts with `CC` (this drops the total row), keeps the cost centre, the account and the month columns (this drops `FY` and `Q4`), and unpivots the months with `Table.UnpivotOtherColumns`. Scenario and year come from the sheet name.
-- The `FactGL` partition only references staging queries: the unpivoted budget merged with the accounts for the sign, combined with the actuals. Every type conversion passes the culture en-US.
+- The `FactGL` partition only references staging queries: the unpivoted budget merged with the accounts for the sign, combined with the actuals. Every column type conversion passes the culture en-US.
 
 ## Consequences
 

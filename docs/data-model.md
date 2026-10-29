@@ -80,7 +80,7 @@ Parameters: `DataFolder` (text, default `C:\financial-reporting-dashboard\data\`
 - `src_Budget`: `budget.xlsx`; per sheet the three rows above the header skipped and the header promoted, only rows whose `Cost centre` starts with `CC`, then `Table.UnpivotOtherColumns` on `Cost centre` and `Account`, which turns the month columns into rows; empty and zero values dropped; `Scenario` and `Year` from the sheet name, `Date` from the year and the month name. `FY`, `Q4` and `Total` never reach the facts.
 - `src_Accounts`, `src_CostCentres`, `src_Layout`, `src_Security`: one CSV each.
 
-The `FactGL` partition only references: `src_Budget` merged with `src_Accounts` on `Account` for the sign, `Amount` = value × sign, combined with `src_GL`. Every type conversion passes the culture `en-US`, so a Desktop with German regional settings still reads `.` decimals.
+The `FactGL` partition only references: `src_Budget` merged with `src_Accounts` on `Account` for the sign, `Amount` = value × sign, combined with `src_GL`. Every column type conversion passes the culture `en-US`, so a Desktop with German regional settings still reads `.` decimals.
 
 ## Generator
 

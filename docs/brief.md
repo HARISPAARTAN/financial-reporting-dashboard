@@ -6,7 +6,7 @@
 
 Rebuilt from memory as a demo. The original client's name and data are not used.
 
-Kaldora Facility Services is a fictional company. Every account balance, budget value, person and number in this repository comes from the seeded generator `tools/make_data.py`; e-mail addresses use the reserved domain `kaldora.example`.
+Kaldora Facility Services is a fictional company. Every account balance, budget value, person and number in the data files comes from the seeded generator `tools/make_data.py`; e-mail addresses use the reserved domain `kaldora.example`.
 
 ## Users and roles
 

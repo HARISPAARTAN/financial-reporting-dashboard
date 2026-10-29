@@ -4,7 +4,7 @@ The one validation session in Power BI Desktop, as a checklist. The person in De
 
 ## Before the session
 
-- Every offline test is green: `uv run pytest -q` (the TOM parse test with `uv run --group pbi pytest tests/pbi/test_tmdl_tom.py -q` after `tools/pbi/copy_tom.py`).
+- Every offline test is green: `uv run pytest -q` (the TOM parse test with `uv run --group pbi pytest tests/pbi/test_tmdl_tom.py -q` after `uv run python tools/pbi/copy_tom.py --from <folder with the six assemblies>`).
 - No Desktop cache exists: `find pbip -name cache.abf` prints nothing.
 - The report equals its source: `uv run python tools/pbi/build_report.py` followed by `git status --short pbip` prints nothing.
 - The Python column of `docs/reconciliation.md` is filled and `tests/test_measures.py` passes.
@@ -31,9 +31,9 @@ Both come from `data/security.csv`; a regenerated data set with other names chan
 4. Model view: five relationships are drawn (`FactGL` to `DimDate`, `DimAccount`, `DimCostCentre` and `DimScenario`; `DimAccount` to `DimPnLLine`); `DimDate`, Table tools: Mark as date table is set on `Date`; `Security`, `PnLColumn` and `ReconCheck` have no relationship.
 5. Report view, page Reconciliation (hidden in view mode, shown with a hidden icon in Desktop). Capture the table (13 rows, R1 to R13) and the card `Fact rows` (6,936), and enter the values in the Desktop column of `docs/reconciliation.md`. Fix a mismatch in the DAX first and read the page again; take the screenshots afterwards.
 6. The default state of every page (Ctrl+click on Reset first if a slicer moved). Open P&L statement, Variance analysis, Trend, Opex, Department detail (from its page tab: all departments) and Info, then the page Line tooltip and the model view; capture each.
-7. Interactions, each captured: on P&L statement, expand Revenue and Operating expenses with the + icons of the matrix; on Variance analysis, a click on a waterfall column (the matrix and the bars follow it), then right-click on the Security Services bar, Drill through, Department detail, and Back; on Trend, the pointer resting on a month of "Monthly actual, budget and forecast", so the tooltip page shows; Ctrl+click on Reset on each page that has it.
+7. Interactions, each captured: on P&L statement, expand Revenue and Operating expenses with the + icons of the matrix; on Variance analysis, a click on a waterfall column (only the matrix follows it; the bars and the tiles are set to no filtering), then right-click on the Security Services bar, Drill through, Department detail, and Back; on Trend, the pointer resting on a month of "Monthly actual, budget and forecast", so the tooltip page shows; Ctrl+click on Reset on each page that has it.
 8. Row-level security: Modeling, View as, Other user = the Head of Operations address above, tick `Department head`, OK. Open P&L statement: the Department slicer lists the four operating departments, and Revenue shows `33,883`, EBITDA `5,687` with `-4.9 %`. Capture it. Repeat with the head of Security Services: one department, Revenue `6,435` (R13). Capture it, then Stop viewing.
-9. File, Save; close Desktop. Then follow "After the session".
+9. Note Desktop's version (Help, About) for the session line of `docs/reconciliation.md`. File, Save; close Desktop. Then follow "After the session".
 
 ## What to check on the pages
 
@@ -49,7 +49,7 @@ Some formatting objects are written from the published schemas but only Desktop 
 | Variance colours | `Variance`, `Variance %` and `Status` in the ok colour when favourable, the warning colour when unfavourable, muted on plan (Variance analysis, Opex, Department detail) | Format, Cell elements, Font color, fx, Field value, `Favourable colour` |
 | KPI deltas | the `vs budget` card under each value card, its text in the favourable colour, nothing cut off | Format, Callout value, Color, fx, Field value, `Favourable colour`; resize the two cards inside the tile |
 | Department bars (Variance analysis) | six bars with data labels: Cleaning Services and Catering in the warning colour, Technical Maintenance and Security Services in the ok colour, Administration and Sales & Marketing muted | Format, Bars, Color, fx, Field value, `Favourable colour` |
-| Waterfall (Variance analysis) | four account groups and the total `EBIT variance`; increases ok, decreases warning, the total in the muted colour | Format, Sentiment colors: Increase, Decrease and Total |
+| Waterfall (Variance analysis) | four account groups and the total column (Desktop captions it Total); increases ok, decreases warning, the total in the muted colour | Format, Sentiment colors: Increase, Decrease and Total |
 | Trend lines | Actual solid, Budget dashed and muted, Forecast dotted in the fourth series colour | Format, Lines, series Budget Line style Dashed, series Forecast Line style Dotted |
 | Treemap (Opex) | the five opex subgroups with their accounts | Build, Category `Subgroup`, Details `Account label` |
 | Largest opex variances (Opex) | ten rows sorted by `Variance` | Filters pane, Account label, Top N 10 by Variance |
