@@ -54,6 +54,13 @@ def test_two_runs_give_the_same_bytes(tmp_path: Path) -> None:
         assert len(digests) == 1, name
 
 
+def test_workbook_entries_record_no_platform(tmp_path: Path) -> None:
+    make_data.generate(tmp_path)
+    for path in (WORKBOOK, tmp_path / "budget.xlsx"):
+        with zipfile.ZipFile(path) as archive:
+            assert {item.create_system for item in archive.infolist()} == {0}, path
+
+
 def test_six_small_files_utf8_lf_without_bom() -> None:
     assert sorted(p.name for p in DATA.iterdir()) == sorted(make_data.FILES)
     for path in DATA.iterdir():

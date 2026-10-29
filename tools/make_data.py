@@ -493,6 +493,7 @@ def write_budget(path: Path, plan: dict[tuple[str, str], list[int]], fc: dict[tu
             entry = zipfile.ZipInfo(item.filename, date_time=stamp)
             entry.compress_type = zipfile.ZIP_STORED
             entry.external_attr = 0o600 << 16
+            entry.create_system = 0  # the central directory records no platform, so Linux builds match
             data = source.read(item.filename)
             if item.filename == "docProps/core.xml":
                 data = MODIFIED.sub(rb"\g<1>" + EXPORT_STAMP + rb"\g<2>", data)
