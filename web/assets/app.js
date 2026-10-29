@@ -145,7 +145,10 @@ function buildFilters() {
     for (const menu of document.querySelectorAll('details.menu[open]')) if (!menu.contains(e.target)) menu.open = false;
   });
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') closeMenus();
+    if (e.key !== 'Escape') return;
+    const menu = document.querySelector('details.menu[open]');
+    closeMenus();
+    if (menu) menu.querySelector('summary').focus();
   });
 }
 
@@ -215,6 +218,10 @@ function toggleRow(key) {
   if (open.has(key)) open.delete(key);
   else open.add(key);
   update({ expanded: [...open] });
+  // the render replaced the table body, so the keyboard focus goes back to the toggle of the same row
+  for (const button of document.querySelectorAll('#pnl-table .rowtoggle')) {
+    if (button.dataset.key === key) button.focus();
+  }
 }
 
 function renderStatement() {
@@ -248,6 +255,7 @@ function renderStatement() {
         const button = document.createElement('button');
         button.type = 'button';
         button.className = 'rowtoggle';
+        button.dataset.key = key;
         button.setAttribute('aria-expanded', String(state.expanded.includes(key)));
         button.textContent = rowLabel(row);
         button.addEventListener('click', () => toggleRow(key));

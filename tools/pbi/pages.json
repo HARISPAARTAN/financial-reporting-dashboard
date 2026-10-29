@@ -111,7 +111,7 @@
           "roles": {"Category": [["DimPnLLine", "Line", "Column"]], "Y": [["_Measures", "Profit impact", "Measure"]]},
           "filters": [{"field": ["DimPnLLine", "Line type"], "in": ["Group"]}],
           "sort": {"field": ["DimPnLLine", "Line", "Column"], "direction": "Ascending"},
-          "sentiment": {"increase": "ok", "decrease": "warn", "total": "accent"},
+          "sentiment": {"increase": "ok", "decrease": "warn", "total": "muted"},
           "data_labels": true
         },
         {

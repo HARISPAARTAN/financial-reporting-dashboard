@@ -101,7 +101,7 @@ export function stackParts(start, end) {
 
 /** `narrow` (a chart under 480 px) turns the category labels so that the five names keep apart. */
 export function waterfall(steps, c, { motion = true, narrow = false } = {}) {
-  const colour = { increase: c.ok, decrease: c.warn, total: c.accent };
+  const colour = { increase: c.ok, decrease: c.warn, total: c.muted };
   const parts = steps.map((s) => stackParts(thousand(s.start), thousand(s.end)));
   const visible = (key) =>
     steps.map((s, i) => ({ value: parts[i][key] || null, itemStyle: { color: colour[s.kind] } }));

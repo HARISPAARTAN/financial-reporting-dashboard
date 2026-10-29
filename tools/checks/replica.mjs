@@ -2,7 +2,8 @@
 // web/assets/pnl.js computes for the headline state S1 of kaldora.json; expanding Revenue shows its three subgroups
 // and is remembered; Budget shows the budget full year of Revenue; the Variance tab draws six department bars, and a
 // click on the Security Services bar scopes the waterfall to it; Reset clears the stored view; at 390 px the P&L
-// table hides the months until "Show months" is pressed, and the page never scrolls sideways. The run also fails on
+// table hides the months until "Show months" is pressed and keeps its Full year column inside the table box, and the
+// page never scrolls sideways. The run also fails on
 // console errors, page errors and requests that leave the served address.
 // Usage (from the repository root, Node 22):
 //   PLAYWRIGHT_FROM=<package.json of a folder that has playwright installed> node tools/checks/replica.mjs
@@ -63,6 +64,11 @@ try {
     narrow.page.$$eval('#pnl-table thead th.m', (ths) => ths.filter((th) => th.getClientRects().length > 0).length);
   const before = await visibleMonths();
   expect(before === 0, `${before} month columns visible at 390 px before Show months`);
+  const fullYearIn = await narrow.page.evaluate(() => {
+    const th = [...document.querySelectorAll('#pnl-table thead th')].find((cell) => cell.textContent === 'Full year');
+    return th.getBoundingClientRect().right - document.getElementById('pnl-wrap').getBoundingClientRect().right;
+  });
+  expect(fullYearIn <= 1, `the Full year column ends ${fullYearIn} px beyond the table box at 390 px`);
   await narrow.page.click('#show-months');
   await narrow.page.waitForTimeout(250);
   const after = await visibleMonths();

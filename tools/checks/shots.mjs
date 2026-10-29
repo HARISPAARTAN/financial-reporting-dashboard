@@ -37,6 +37,7 @@ let shots = 0;
 async function shot(page, where, name, fullPage = true) {
   const wide = await overflow(page);
   if (wide > 1) problems.push(`${where}: ${name} scrolls sideways by ${wide} px`);
+  await page.evaluate(() => window.scrollTo(0, 0)); // the fixed banner is drawn at the scroll offset of a full-page capture
   await page.screenshot({ path: path.join(OUT, `${name}.png`), fullPage });
   shots += 1;
 }

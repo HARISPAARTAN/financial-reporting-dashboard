@@ -293,8 +293,8 @@
   background: var(--warn);
 }
 
-.legend i.acc {
-  background: var(--accent);
+.legend i.total {
+  background: var(--muted);
 }
 
 .pick {
@@ -348,6 +348,12 @@
 .pf-table.vtable tbody tr.is-sub:nth-child(n) > * {
   background: var(--row-tint);
   font-weight: 600;
+}
+
+/* the kit clears the border of the last row for td only */
+.pnl tbody tr:last-child th,
+.vtable tbody tr:last-child th {
+  border-bottom: 0;
 }
 
 .pnl th.lvl1 {
@@ -477,11 +483,24 @@
     min-width: 10rem;
   }
 
+  /* the row labels wrap, so that Line, YTD and Full year (P&L) and Line, Actual, Budget and Variance fit the box */
+  .pnl th,
+  .pnl td,
+  .vtable th,
+  .vtable td {
+    padding: 8px 6px;
+  }
+
+  .pnl tbody th,
+  .vtable tbody th {
+    white-space: normal;
+  }
+
   .pnl th.lvl1 {
-    padding-left: 24px;
+    padding-left: 18px;
   }
 
   .pnl th.lvl2 {
-    padding-left: 36px;
+    padding-left: 28px;
   }
 }

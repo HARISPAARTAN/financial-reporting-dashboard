@@ -280,7 +280,7 @@ def formatting_problems(report):
     waterfall = visual(report, "Variance analysis", "waterfall")
     fills = waterfall.raw["visual"]["objects"]["sentimentColors"][0]["properties"]
     colours = {k: lit(v["solid"]["color"]).strip("'") for k, v in fills.items()}
-    if colours != {"increaseFill": t["ok"], "decreaseFill": t["warn"], "totalFill": t["accent"]}:
+    if colours != {"increaseFill": t["ok"], "decreaseFill": t["warn"], "totalFill": t["muted"]}:
         out.append(f"waterfall colours {colours}")
     return out
 

@@ -33,7 +33,7 @@ test('the waterfall of S1 walks from 0 to the EBIT variance through the four acc
   assert.equal(option.series.length, 3);
   assert.equal(option.series[0].itemStyle.color, 'transparent');
   assert.equal(waterfall(steps, C, { motion: false, narrow: true }).xAxis.axisLabel.rotate, 35);
-  assert.deepEqual(option.series[1].data.map((d) => d.itemStyle.color), steps.map((s) => ({ increase: C.ok, decrease: C.warn, total: C.accent })[s.kind]));
+  assert.deepEqual(option.series[1].data.map((d) => d.itemStyle.color), steps.map((s) => ({ increase: C.ok, decrease: C.warn, total: C.muted })[s.kind]));
   steps.forEach((s, i) => {
     const total = option.series[0].data[i] + (option.series[1].data[i].value ?? 0) + (option.series[2].data[i].value ?? 0);
     const top = Math.abs(s.start) > Math.abs(s.end) ? s.start : s.end;
