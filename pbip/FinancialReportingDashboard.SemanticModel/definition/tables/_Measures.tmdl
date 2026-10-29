@@ -1,0 +1,334 @@
+/// Measure table: every report measure lives here; the single hidden column only anchors the table.
+table _Measures
+	lineageTag: ae848e2a-5bb6-57d1-8e17-9b847b79b48c
+
+	/// Signed amount, EUR: income +, expense - (FactGL[Amount], profit contribution).
+	measure Amount = SUM(FactGL[Amount])
+		formatString: #,0.00
+		displayFolder: Base
+		lineageTag: d82b6790-7746-5b04-8e9a-026fb4953546
+
+	/// Month end of the last closed month: the latest actual date, whatever the slicers.
+	measure 'Last actual date' = EOMONTH(CALCULATE(MAX(FactGL[Date]), REMOVEFILTERS(), DimScenario[Scenario] = "Actual"), 0)
+		formatString: d mmm yyyy
+		displayFolder: Base
+		lineageTag: f86438d8-55fe-5a48-af39-8fb5c3e51bfa
+
+	/// TRUE on the margin lines (line type Ratio).
+	measure 'Is ratio line' = SELECTEDVALUE(DimPnLLine[Line type]) = "Ratio"
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		displayFolder: Base
+		lineageTag: 3d820983-3f74-5e3f-a938-691f91065873
+
+	/// Display sign of the line in context: +1 income and subtotals, -1 cost groups; 1 without a line.
+	measure 'Line sign' = SELECTEDVALUE(DimPnLLine[Sign], 1)
+		formatString: 0
+		displayFolder: Base
+		lineageTag: 8d345da1-d25c-573e-a347-8b4724310b43
+
+	/// Value of the P&L line in context: a group in display sign, a subtotal as the signed sum of the groups above it, a ratio as that subtotal over revenue; without a line the EBIT contribution.
+	measure 'P&L Value' =
+			VAR _type = SELECTEDVALUE(DimPnLLine[Line type])
+			VAR _bound = SELECTEDVALUE(DimPnLLine[Bound])
+			VAR _detail = ISINSCOPE(DimAccount[Subgroup]) || ISINSCOPE(DimAccount[Account label])
+			VAR _upTo = CALCULATE([Amount], REMOVEFILTERS(DimPnLLine), DimAccount[Group sort] < _bound)
+			VAR _rev = CALCULATE([Amount], REMOVEFILTERS(DimPnLLine), DimPnLLine[Line key] = "REV")
+			RETURN
+			    SWITCH(
+			        _type,
+			        "Group", [Amount] * [Line sign],
+			        "Subtotal", IF(NOT _detail, _upTo),
+			        "Ratio", IF(NOT _detail, DIVIDE(_upTo, _rev)),
+			        [Amount]
+			    )
+		displayFolder: Base
+		lineageTag: 9c1a3e4f-f792-5174-bca5-56ad3ae191d6
+
+		formatStringDefinition = IF([Is ratio line], "0.0 %", "#,0,;(#,0,);0")
+
+	/// P&L Value of the ledger actuals.
+	measure Actual = CALCULATE([P&L Value], DimScenario[Scenario] = "Actual")
+		displayFolder: Scenarios
+		lineageTag: cb238551-1968-5c06-994d-fbfcb28cc6a3
+
+		formatStringDefinition = IF([Is ratio line], "0.0 %", "#,0,;(#,0,);0")
+
+	/// P&L Value of the budget of the year.
+	measure Budget = CALCULATE([P&L Value], DimScenario[Scenario] = "Budget")
+		displayFolder: Scenarios
+		lineageTag: caf04a9a-a8e4-51e2-a8c5-d2eab099f5bd
+
+		formatStringDefinition = IF([Is ratio line], "0.0 %", "#,0,;(#,0,);0")
+
+	/// P&L Value of the Q4 2025 forecast.
+	measure Forecast = CALCULATE([P&L Value], DimScenario[Scenario] = "Forecast")
+		displayFolder: Scenarios
+		lineageTag: 13a5b897-0036-52f2-9822-335c93948186
+
+		formatStringDefinition = IF([Is ratio line], "0.0 %", "#,0,;(#,0,);0")
+
+	/// Latest estimate: actuals up to the last closed month, forecast after it.
+	measure Outlook =
+			VAR _last = [Last actual date]
+			VAR _cells =
+			    FILTER(
+			        CROSSJOIN(ALL(DimScenario[Scenario]), VALUES(DimDate[Date])),
+			        (DimScenario[Scenario] = "Actual" && DimDate[Date] <= _last)
+			            || (DimScenario[Scenario] = "Forecast" && DimDate[Date] > _last)
+			    )
+			RETURN CALCULATE([P&L Value], _cells)
+		displayFolder: Scenarios
+		lineageTag: 08603a15-9496-5952-a29d-836631e82a22
+
+		formatStringDefinition = IF([Is ratio line], "0.0 %", "#,0,;(#,0,);0")
+
+	/// Budget of the closed months only, the basis of every comparison with actuals.
+	measure 'Budget (closed months)' =
+			VAR _last = [Last actual date]
+			RETURN CALCULATE([Budget], KEEPFILTERS(DimDate[Date] <= _last))
+		displayFolder: Scenarios
+		lineageTag: 32bbed15-f8fb-5563-b9ab-6347310678b4
+
+		formatStringDefinition = IF([Is ratio line], "0.0 %", "#,0,;(#,0,);0")
+
+	/// The scenario picked in the Scenario slicer: Budget, Forecast (the outlook) or Actual.
+	measure 'P&L Statement' =
+			SWITCH(
+			    SELECTEDVALUE(DimScenario[Scenario], "Actual"),
+			    "Budget", [Budget],
+			    "Forecast", [Outlook],
+			    [Actual]
+			)
+		displayFolder: Scenarios
+		lineageTag: 61bac8c6-2cff-52f3-8d0d-74637a47c21c
+
+		formatStringDefinition = IF([Is ratio line], "0.0 %", "#,0,;(#,0,);0")
+
+	/// Cell of the P&L matrix: a month, YTD (January to the end of the month range) or the full year.
+	measure 'P&L Matrix' =
+			VAR _col = SELECTEDVALUE(PnLColumn[Sort])
+			RETURN
+			    SWITCH(
+			        TRUE(),
+			        ISBLANK(_col), BLANK(),
+			        _col <= 12, CALCULATE([P&L Statement], KEEPFILTERS(DimDate[Month number] = _col)),
+			        _col = 13, CALCULATE([P&L Statement], DATESYTD(DimDate[Date])),
+			        IF(SELECTEDVALUE(DimScenario[Scenario], "Actual") = "Budget", [Budget full year], [Full-year outlook])
+			    )
+		displayFolder: Scenarios
+		lineageTag: 361fbf72-549c-5dcd-b8af-1d424ca7d1e7
+
+		formatStringDefinition = IF([Is ratio line], "0.0 %", "#,0,;(#,0,);0")
+
+	/// Actual minus the budget of the closed months, in display sign; percentage points on ratio lines.
+	measure Variance =
+			VAR _a = [Actual]
+			VAR _b = [Budget (closed months)]
+			RETURN IF(NOT (ISBLANK(_a) && ISBLANK(_b)), (_a - _b) * IF([Is ratio line], 100, 1))
+		displayFolder: Variance
+		lineageTag: cd671ccc-49b9-59f8-ab8a-37739f0f51fd
+
+		formatStringDefinition = IF([Is ratio line], "+0.0"" pp"";-0.0"" pp"";0.0"" pp""", "+#,0,;-#,0,;0")
+
+	/// Variance as a share of the absolute closed-month budget; blank on ratio lines.
+	measure 'Variance %' = IF(NOT [Is ratio line], DIVIDE([Variance], ABS([Budget (closed months)])))
+		formatString: +0.0 %;-0.0 %;0.0 %
+		displayFolder: Variance
+		lineageTag: fce7f4a9-b606-595c-b80c-41c490cc3a2b
+
+	/// 1 favourable, -1 unfavourable, 0 on plan (within 1 % or 0.1 pp); blank without a variance.
+	measure Favourable =
+			VAR _v = [Variance]
+			VAR _p = [Variance %]
+			VAR _neutral = IF([Is ratio line], ABS(_v) < 0.1, NOT ISBLANK(_p) && ABS(_p) < 0.01)
+			RETURN IF(NOT ISBLANK(_v), IF(_neutral, 0, SIGN(_v * [Line sign])))
+		formatString: 0
+		displayFolder: Variance
+		lineageTag: 4169c6d5-c4fa-5d3f-b740-a2e84b2b8b3b
+
+	/// Effect of the variance on EBIT: Variance times the line sign; the four group impacts add up to the EBIT variance.
+	measure 'Profit impact' = IF(NOT [Is ratio line], [Variance] * [Line sign])
+		formatString: +#,0,;-#,0,;0
+		displayFolder: Variance
+		lineageTag: 67ef8a90-1f1d-5958-afa0-68ee3fc98ef8
+
+	/// Full-year outlook minus the full-year budget; percentage points on ratio lines.
+	measure 'Outlook vs budget' = ([Full-year outlook] - [Budget full year]) * IF([Is ratio line], 100, 1)
+		displayFolder: Variance
+		lineageTag: f2db653b-b096-54f0-b0c8-ca7a00c88a9a
+
+		formatStringDefinition = IF([Is ratio line], "+0.0"" pp"";-0.0"" pp"";0.0"" pp""", "+#,0,;-#,0,;0")
+
+	/// The status in words: Fav., Unfav. or On plan; blank without a variance.
+	measure 'Favourable label' =
+			VAR _f = [Favourable]
+			RETURN IF(NOT ISBLANK(_f), SWITCH(_f, 1, "Fav.", -1, "Unfav.", "On plan"))
+		displayFolder: Variance
+		lineageTag: 52709e0e-8a8a-5507-8bcf-592454f53ffd
+
+	/// Actuals from January to the month in context; blank after the last closed month.
+	measure 'Actual YTD' = IF(MIN(DimDate[Date]) <= [Last actual date], CALCULATE([Actual], DATESYTD(DimDate[Date])))
+		displayFolder: Time
+		lineageTag: a6d5123b-3036-5750-a9d6-247d176d390f
+
+		formatStringDefinition = IF([Is ratio line], "0.0 %", "#,0,;(#,0,);0")
+
+	/// Budget from January to the month in context (the full plan path).
+	measure 'Budget YTD' = CALCULATE([Budget], DATESYTD(DimDate[Date]))
+		displayFolder: Time
+		lineageTag: b9830ffd-e68b-591a-a26c-9088466de1c1
+
+		formatStringDefinition = IF([Is ratio line], "0.0 %", "#,0,;(#,0,);0")
+
+	/// Outlook from January to the month in context.
+	measure 'Outlook YTD' = CALCULATE([Outlook], DATESYTD(DimDate[Date]))
+		displayFolder: Time
+		lineageTag: 880b9aad-5a39-5fe2-89d9-001e1c355ec4
+
+		formatStringDefinition = IF([Is ratio line], "0.0 %", "#,0,;(#,0,);0")
+
+	/// Outlook of the whole year in context: actuals to date plus the forecast.
+	measure 'Full-year outlook' =
+			VAR _y = MAX(DimDate[Year])
+			RETURN CALCULATE([Outlook], REMOVEFILTERS(DimDate), DimDate[Year] = _y)
+		displayFolder: Time
+		lineageTag: 80f423f7-06c9-58ef-b082-ddba42b71294
+
+		formatStringDefinition = IF([Is ratio line], "0.0 %", "#,0,;(#,0,);0")
+
+	/// Budget of the whole year in context.
+	measure 'Budget full year' =
+			VAR _y = MAX(DimDate[Year])
+			RETURN CALCULATE([Budget], REMOVEFILTERS(DimDate), DimDate[Year] = _y)
+		displayFolder: Time
+		lineageTag: f70e8f3a-ede0-5874-9e3c-74ff57c677bf
+
+		formatStringDefinition = IF([Is ratio line], "0.0 %", "#,0,;(#,0,);0")
+
+	/// Actual revenue of the selected period, whatever the line in context.
+	measure Revenue = CALCULATE([Actual], REMOVEFILTERS(DimPnLLine), DimPnLLine[Line key] = "REV")
+		formatString: #,0,;(#,0,);0
+		displayFolder: Lines
+		lineageTag: 252d26ab-797e-5514-bf11-55642d4239d4
+
+	/// Actual gross margin: gross profit over revenue.
+	measure 'Gross margin %' = CALCULATE([Actual], REMOVEFILTERS(DimPnLLine), DimPnLLine[Line key] = "GPM")
+		formatString: 0.0 %
+		displayFolder: Lines
+		lineageTag: 1acf7144-3016-5b18-b10b-efbd9035fea4
+
+	/// Actual EBITDA margin: EBITDA over revenue.
+	measure 'EBITDA margin %' = CALCULATE([Actual], REMOVEFILTERS(DimPnLLine), DimPnLLine[Line key] = "EBITDAM")
+		formatString: 0.0 %
+		displayFolder: Lines
+		lineageTag: 23a97c01-0ad0-53ce-8e14-9a54ea8d5c70
+
+	/// Actual operating expenses over revenue.
+	measure 'Opex % of revenue' = DIVIDE(CALCULATE([Actual], REMOVEFILTERS(DimPnLLine), DimPnLLine[Line key] = "OPEX"), [Revenue])
+		formatString: 0.0 %
+		displayFolder: Lines
+		lineageTag: 41fd8225-7795-53d0-8b7c-bd4fe0263620
+
+	/// Actual cost of both personnel subgroups (direct and overhead), as a positive amount.
+	measure 'Personnel cost' =
+			CALCULATE(
+			    -[Amount],
+			    REMOVEFILTERS(DimPnLLine),
+			    DimScenario[Scenario] = "Actual",
+			    DimAccount[Subgroup] IN {"Direct personnel", "Overhead personnel"}
+			)
+		formatString: #,0,;(#,0,);0
+		displayFolder: Lines
+		lineageTag: 7a1205d3-bb15-5dc2-88c7-f10b8a54c673
+
+	/// Personnel cost over revenue.
+	measure 'Personnel cost % of revenue' = DIVIDE([Personnel cost], [Revenue])
+		formatString: 0.0 %
+		displayFolder: Lines
+		lineageTag: d02842cb-255f-5ff4-a007-3ce885574d6e
+
+	/// Font colour of a variance: ok when favourable, warn when unfavourable, muted on plan.
+	measure 'Favourable colour' =
+			VAR _f = [Favourable]
+			RETURN IF(NOT ISBLANK(_f), SWITCH(_f, 1, "#3DDC97", -1, "#FACC15", "#93A1B0"))
+		isHidden
+		displayFolder: Formatting
+		lineageTag: 3afd7169-f0d1-543c-9a9e-ce2e4144bb82
+
+	/// Background of the subtotal and ratio rows of the P&L matrices (kit token surface-2).
+	measure 'Row tint' =
+			IF(
+			    SELECTEDVALUE(DimPnLLine[Line type]) IN {"Subtotal", "Ratio"}
+			        && NOT ISINSCOPE(DimAccount[Subgroup])
+			        && NOT ISINSCOPE(DimAccount[Account label]),
+			    "#182130"
+			)
+		isHidden
+		displayFolder: Formatting
+		lineageTag: b86d1b86-24ab-584c-bdb7-fd1fc51d3ecc
+
+	/// Rows of FactGL in the filter context.
+	measure Rows = COUNTROWS(FactGL)
+		formatString: #,0
+		displayFolder: Info
+		lineageTag: 3a7f4346-af8c-53dd-94c3-e292a5f790de
+
+	/// Header text: the last closed month and the last forecast month, in English.
+	measure 'Data as of' =
+			VAR _forecast = CALCULATE(MAX(FactGL[Date]), REMOVEFILTERS(), DimScenario[Scenario] = "Forecast")
+			RETURN "Actuals through " & FORMAT([Last actual date], "mmm yyyy", "en-US") & " · forecast through "
+			    & FORMAT(_forecast, "mmm yyyy", "en-US")
+		displayFolder: Info
+		lineageTag: 5e508304-f40d-507c-b6f4-cc22034cc1b6
+
+	/// The department in context, or All departments.
+	measure 'Selected department' = SELECTEDVALUE(DimCostCentre[Name], "All departments")
+		displayFolder: Info
+		lineageTag: 5ce3b6a9-fd02-5cbe-b935-d20d055c0923
+
+	/// Head of the department in context; blank for several.
+	measure 'Department head' = SELECTEDVALUE(DimCostCentre[Head name])
+		displayFolder: Info
+		lineageTag: 68d9b08e-c059-5bd2-b9c0-a4e1a4366c76
+
+	/// Value of the reconciliation check in context (ReconCheck[Id]); it ignores the slicers, not the role.
+	measure 'Check value' =
+			VAR _id = SELECTEDVALUE(ReconCheck[Id])
+			RETURN
+			    SWITCH(
+			        _id,
+			        "R1", CALCULATE([Rows], REMOVEFILTERS()),
+			        "R2", CALCULATE([Revenue], REMOVEFILTERS(), DimDate[Year] = 2023),
+			        "R3", CALCULATE([Actual], REMOVEFILTERS(), DimDate[Year] = 2024, DimPnLLine[Line key] = "EBITDA"),
+			        "R4", CALCULATE([Actual], REMOVEFILTERS(), DimDate[Year] = 2025, DimDate[Month number] <= 9, DimPnLLine[Line key] = "EBIT"),
+			        "R5", CALCULATE([Gross margin %], REMOVEFILTERS(), DimDate[Year] = 2025, DimDate[Month number] <= 9),
+			        "R6", CALCULATE([Budget], REMOVEFILTERS(), DimDate[Year] = 2025, DimPnLLine[Line key] = "REV"),
+			        "R7", CALCULATE([Budget (closed months)], REMOVEFILTERS(), DimDate[Year] = 2025, DimPnLLine[Line key] = "EBITDA"),
+			        "R8", CALCULATE([Forecast], REMOVEFILTERS(), DimDate[Year] = 2025, DimPnLLine[Line key] = "REV"),
+			        "R9", CALCULATE([Full-year outlook], REMOVEFILTERS(), DimDate[Year] = 2025, DimPnLLine[Line key] = "EBIT"),
+			        "R10", CALCULATE([Variance], REMOVEFILTERS(), DimDate[Year] = 2025, DimDate[Month number] <= 9,
+			            DimPnLLine[Line key] = "EBITDA", DimCostCentre[Cost centre] = "CC30"),
+			        "R11", CALCULATE([Actual], REMOVEFILTERS(), DimDate[Year] = 2025, DimDate[Month number] <= 9, DimPnLLine[Line key] = "OPEX"),
+			        "R12", CALCULATE([Personnel cost % of revenue], REMOVEFILTERS(), DimDate[Year] = 2024),
+			        "R13", CALCULATE([Revenue], REMOVEFILTERS(), DimDate[Year] = 2025, DimDate[Month number] <= 9,
+			            DimCostCentre[Cost centre] = "CC30")
+			    )
+		isHidden
+		displayFolder: Info
+		lineageTag: cc740795-bb21-5191-84c2-ccc591413704
+
+		formatStringDefinition = SWITCH(SELECTEDVALUE(ReconCheck[Kind]), "ratio", "0.0000", "count", "#,0", "#,0.00")
+
+	column Anchor
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 212dab8e-bf73-549f-bf02-07b3ab14ef80
+		summarizeBy: none
+		sourceColumn: [Value]
+
+		annotation SummarizationSetBy = User
+
+	partition _Measures = calculated
+		mode: import
+		source = {BLANK()}

@@ -1,0 +1,65 @@
+/// The six cost centres (departments) with their heads (data/cost_centres.csv).
+table DimCostCentre
+	lineageTag: d280e065-9f5b-5282-a8d9-c0f5fa34590b
+
+	column 'Cost centre'
+		dataType: string
+		isHidden
+		lineageTag: 5c984666-20be-5070-8940-60cb0d981230
+		summarizeBy: none
+		sourceColumn: Cost centre
+
+		annotation SummarizationSetBy = Automatic
+
+	column Name
+		dataType: string
+		lineageTag: 4512a6c7-0307-57be-bcfa-cfe02f43bd6f
+		summarizeBy: none
+		sourceColumn: Name
+		sortByColumn: Sort
+
+		annotation SummarizationSetBy = Automatic
+
+	column Type
+		dataType: string
+		lineageTag: 810715d1-8603-56ab-8e49-59e3854e00cd
+		summarizeBy: none
+		sourceColumn: Type
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Head name'
+		dataType: string
+		lineageTag: f805e20d-5fea-5adb-a56a-480c2406d01d
+		summarizeBy: none
+		sourceColumn: Head name
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Head email'
+		dataType: string
+		lineageTag: 6e5198b4-44a4-5bf5-b64f-9d8e4750a274
+		summarizeBy: none
+		sourceColumn: Head email
+
+		annotation SummarizationSetBy = Automatic
+
+	column Sort
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 88fb392b-bae8-5d82-a857-cf025b50b2aa
+		summarizeBy: none
+		sourceColumn: Sort
+
+		annotation SummarizationSetBy = User
+
+	partition DimCostCentre = m
+		mode: import
+		source =
+				let
+				    Source = src_CostCentres
+				in
+				    Source
+
+	annotation PBI_ResultType = Table

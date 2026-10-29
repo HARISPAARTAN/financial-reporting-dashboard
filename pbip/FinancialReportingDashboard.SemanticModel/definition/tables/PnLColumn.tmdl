@@ -1,0 +1,35 @@
+/// Columns of the P&L matrix: the twelve months, YTD and Full year (no relationship).
+table PnLColumn
+	lineageTag: 8443e4dc-56d0-560f-83f1-058fe8a32f91
+
+	column Column
+		dataType: string
+		lineageTag: 399101f9-bbe1-5a2c-baf2-6f89a5bbe5a0
+		summarizeBy: none
+		sourceColumn: Column
+		sortByColumn: Sort
+
+		annotation SummarizationSetBy = Automatic
+
+	column Sort
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: a816b4ae-db5c-546d-b0f3-0850147cb0c5
+		summarizeBy: none
+		sourceColumn: Sort
+
+		annotation SummarizationSetBy = User
+
+	partition PnLColumn = m
+		mode: import
+		source =
+				let
+				    Source = #table(type table [Column = text, Sort = Int64.Type], {
+				        {"Jan", 1}, {"Feb", 2}, {"Mar", 3}, {"Apr", 4}, {"May", 5}, {"Jun", 6},
+				        {"Jul", 7}, {"Aug", 8}, {"Sep", 9}, {"Oct", 10}, {"Nov", 11}, {"Dec", 12},
+				        {"YTD", 13}, {"Full year", 14}})
+				in
+				    Source
+
+	annotation PBI_ResultType = Table

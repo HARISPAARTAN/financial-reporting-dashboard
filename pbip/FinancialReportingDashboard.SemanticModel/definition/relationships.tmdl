@@ -1,0 +1,19 @@
+relationship factgl-dimdate
+	fromColumn: FactGL.Date
+	toColumn: DimDate.Date
+
+relationship factgl-dimaccount
+	fromColumn: FactGL.Account
+	toColumn: DimAccount.Account
+
+relationship factgl-dimcostcentre
+	fromColumn: FactGL.'Cost centre'
+	toColumn: DimCostCentre.'Cost centre'
+
+relationship factgl-dimscenario
+	fromColumn: FactGL.Scenario
+	toColumn: DimScenario.Scenario
+
+relationship dimaccount-dimpnlline
+	fromColumn: DimAccount.'Line key'
+	toColumn: DimPnLLine.'Line key'

@@ -1,0 +1,115 @@
+/// Chart of accounts, 40 accounts, with the sort of its P&L group line and its line key (data/chart_of_accounts.csv).
+table DimAccount
+	lineageTag: 12d4e800-b281-5fd2-a1f9-4cac7c98a317
+
+	column Account
+		dataType: string
+		isHidden
+		lineageTag: 3c477918-11d3-5780-b445-31919ecd71c3
+		summarizeBy: none
+		sourceColumn: Account
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Account name'
+		dataType: string
+		lineageTag: 080d9e4c-dbb9-58b8-aa64-fd5c8d933d62
+		summarizeBy: none
+		sourceColumn: Account name
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Account label'
+		dataType: string
+		lineageTag: 91b766a4-3050-5c7b-b85f-13bbc0242f8f
+		summarizeBy: none
+		sourceColumn: Account label
+		sortByColumn: Sort
+
+		annotation SummarizationSetBy = Automatic
+
+	column Group
+		dataType: string
+		lineageTag: da2bd613-36fa-5daa-b7fd-9fc60f61886e
+		summarizeBy: none
+		sourceColumn: Group
+		sortByColumn: 'Group sort'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Group sort'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 2b638762-0726-5449-b6ac-16d1d330f2ee
+		summarizeBy: none
+		sourceColumn: Group sort
+
+		annotation SummarizationSetBy = User
+
+	column Subgroup
+		dataType: string
+		lineageTag: b89b59c7-652e-554d-941c-de124219fba2
+		summarizeBy: none
+		sourceColumn: Subgroup
+		sortByColumn: 'Subgroup sort'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Subgroup sort'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 72d47ae5-9d25-5d0d-8d6b-980dfdf7671c
+		summarizeBy: none
+		sourceColumn: Subgroup sort
+
+		annotation SummarizationSetBy = User
+
+	column Sign
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: a93ed618-3fbf-547c-83b2-87abc73a5cb3
+		summarizeBy: none
+		sourceColumn: Sign
+
+		annotation SummarizationSetBy = User
+
+	column Sort
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 0bcd4dcb-2482-5743-bbd9-55f551212a40
+		summarizeBy: none
+		sourceColumn: Sort
+
+		annotation SummarizationSetBy = User
+
+	column 'Line key'
+		dataType: string
+		isHidden
+		lineageTag: e956032e-db1f-5c3c-8425-43df31e6665f
+		summarizeBy: none
+		sourceColumn: Line key
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DimAccount = m
+		mode: import
+		source =
+				let
+				    Groups = Table.SelectRows(src_Layout, each [Line type] = "Group"),
+				    Joined = Table.NestedJoin(src_Accounts, {"Group"}, Groups, {"Group"}, "Line", JoinKind.LeftOuter),
+				    WithLine = Table.ExpandTableColumn(Joined, "Line", {"Line key", "Sort"}, {"Line key", "Group sort"}),
+				    Label = Table.AddColumn(WithLine, "Account label", each [Account] & " " & [Account name], type text),
+				    Firsts = Table.Group(Label, {"Subgroup"}, {{"Subgroup sort", each List.Min([Sort]), Int64.Type}}),
+				    WithSubgroup = Table.ExpandTableColumn(Table.NestedJoin(Label, {"Subgroup"}, Firsts, {"Subgroup"}, "First",
+				        JoinKind.LeftOuter), "First", {"Subgroup sort"}),
+				    Selected = Table.SelectColumns(WithSubgroup, {"Account", "Account name", "Account label", "Group", "Group sort", "Subgroup",
+				        "Subgroup sort", "Sign", "Sort", "Line key"}),
+				    Result = Table.TransformColumnTypes(Selected, {{"Group sort", Int64.Type}, {"Subgroup sort", Int64.Type}}, "en-US")
+				in
+				    Result
+
+	annotation PBI_ResultType = Table

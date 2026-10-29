@@ -1,0 +1,7 @@
+/// Department heads see only the cost centres listed for their sign-in address in Security.
+role 'Department head'
+	modelPermission: read
+
+	tablePermission Security = Security[User email] = LOWER(USERPRINCIPALNAME())
+
+	tablePermission DimCostCentre = DimCostCentre[Cost centre] IN CALCULATETABLE(VALUES(Security[Cost centre]), Security[User email] = LOWER(USERPRINCIPALNAME()))

@@ -1,0 +1,61 @@
+/// The 13 reconciliation checks R1 to R13 of docs/reconciliation.md (no relationship).
+table ReconCheck
+	lineageTag: 743955dd-f409-5f28-aa9e-0c71c19d98e8
+
+	column Id
+		dataType: string
+		lineageTag: 42ddfe41-670c-59b5-9b49-47170fc68c32
+		summarizeBy: none
+		sourceColumn: Id
+		sortByColumn: Sort
+
+		annotation SummarizationSetBy = Automatic
+
+	column Label
+		dataType: string
+		lineageTag: ed5e0329-da80-5b1c-b8da-a4a97a4ac0a7
+		summarizeBy: none
+		sourceColumn: Label
+
+		annotation SummarizationSetBy = Automatic
+
+	column Kind
+		dataType: string
+		lineageTag: 14324c7c-6126-56ec-a6c7-8a6245802288
+		summarizeBy: none
+		sourceColumn: Kind
+
+		annotation SummarizationSetBy = Automatic
+
+	column Sort
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 936243f0-f488-589b-8da0-9c044c886056
+		summarizeBy: none
+		sourceColumn: Sort
+
+		annotation SummarizationSetBy = User
+
+	partition ReconCheck = m
+		mode: import
+		source =
+				let
+				    Source = #table(type table [Id = text, Label = text, Kind = text, Sort = Int64.Type], {
+				        {"R1", "Fact rows", "count", 1},
+				        {"R2", "Actual revenue 2023", "amount", 2},
+				        {"R3", "Actual EBITDA 2024", "amount", 3},
+				        {"R4", "Actual EBIT Jan to Sep 2025", "amount", 4},
+				        {"R5", "Actual gross margin % Jan to Sep 2025", "ratio", 5},
+				        {"R6", "Budget revenue 2025, full year", "amount", 6},
+				        {"R7", "Budget EBITDA 2025, closed months", "amount", 7},
+				        {"R8", "Forecast revenue Oct to Dec 2025", "amount", 8},
+				        {"R9", "Full-year outlook EBIT 2025", "amount", 9},
+				        {"R10", "EBITDA variance Jan to Sep 2025, Security Services", "amount", 10},
+				        {"R11", "Actual operating expenses Jan to Sep 2025", "amount", 11},
+				        {"R12", "Personnel cost % of revenue 2024", "ratio", 12},
+				        {"R13", "Revenue Jan to Sep 2025, Security Services", "amount", 13}})
+				in
+				    Source
+
+	annotation PBI_ResultType = Table

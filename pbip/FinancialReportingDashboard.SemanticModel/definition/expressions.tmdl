@@ -1,0 +1,127 @@
+/// Folder of the data files, with a trailing backslash; set it to the clone's data folder.
+expression DataFolder = "C:\financial-reporting-dashboard\data\" meta [IsParameterQuery = true, Type = "Text", IsParameterQueryRequired = true]
+	lineageTag: a8e88bb2-78a0-51d3-a0c1-0e524ff30559
+
+	annotation PBI_ResultType = Text
+
+/// First day of DimDate: 1 January of the first ledger year.
+expression StartDate = #date(2023, 1, 1) meta [IsParameterQuery = true, Type = "Date", IsParameterQueryRequired = true]
+	lineageTag: ddc9210c-6924-57d8-9a58-f883bb30b532
+
+	annotation PBI_ResultType = Date
+
+/// Last day of DimDate: the budget and the forecast run to December 2025.
+expression EndDate = #date(2025, 12, 31) meta [IsParameterQuery = true, Type = "Date", IsParameterQueryRequired = true]
+	lineageTag: 152d3b81-3992-5ef7-8087-17be369d14f9
+
+	annotation PBI_ResultType = Date
+
+/// Staging, not loaded: the ledger export data/gl_actuals.csv as profit contribution (Amount = -amount).
+expression src_GL =
+		let
+		    Source = Csv.Document(File.Contents(DataFolder & "gl_actuals.csv"), [Delimiter = ",", Columns = 4, Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+		    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+		    Typed = Table.TransformColumnTypes(Promoted, {{"period", type text}, {"cost_centre", type text}, {"account", type text},
+		        {"amount", type number}}, "en-US"),
+		    Dated = Table.AddColumn(Typed, "Date", each #date(Number.From(Text.Start([period], 4)), Number.From(Text.End([period], 2)), 1),
+		        type date),
+		    Signed = Table.AddColumn(Dated, "Amount", each -[amount], Currency.Type),
+		    Tagged = Table.AddColumn(Signed, "Scenario", each "Actual", type text),
+		    Renamed = Table.RenameColumns(Tagged, {{"cost_centre", "Cost centre"}, {"account", "Account"}}),
+		    Result = Table.SelectColumns(Renamed, {"Date", "Cost centre", "Account", "Scenario", "Amount"})
+		in
+		    Result
+	lineageTag: 7d6a2df8-a860-54c4-bdf0-011a06463333
+
+	annotation PBI_ResultType = Table
+
+/// Staging, not loaded: every sheet of data/budget.xlsx unpivoted to one row per pair and month (natural sign).
+expression src_Budget =
+		let
+		    Source = Excel.Workbook(File.Contents(DataFolder & "budget.xlsx"), null, true),
+		    Sheets = Table.SelectRows(Source, each [Kind] = "Sheet"),
+		    Months = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"},
+		    Long = (sheet as text, data as table) as table =>
+		        let
+		            Skipped = Table.Skip(data, 3),
+		            Promoted = Table.PromoteHeaders(Skipped, [PromoteAllScalars = true]),
+		            Pairs = Table.SelectRows(Promoted, each [Cost centre] <> null and Text.StartsWith(Text.From([Cost centre]), "CC")),
+		            Kept = Table.SelectColumns(Pairs, {"Cost centre", "Account"} & List.Intersect({Months, Table.ColumnNames(Pairs)})),
+		            Unpivoted = Table.UnpivotOtherColumns(Kept, {"Cost centre", "Account"}, "Month", "Value"),
+		            NonZero = Table.SelectRows(Unpivoted, each [Value] <> null and [Value] <> 0),
+		            Scenario = Text.BeforeDelimiter(sheet, " "),
+		            Year = Number.From(Text.AfterDelimiter(sheet, " ")),
+		            Dated = Table.AddColumn(NonZero, "Date", each #date(Year, List.PositionOf(Months, [Month]) + 1, 1), type date),
+		            Tagged = Table.AddColumn(Dated, "Scenario", each Scenario, type text)
+		        in
+		            Tagged,
+		    Rows = Table.AddColumn(Sheets, "Rows", each Long([Name], [Data])),
+		    Combined = Table.Combine(Rows[Rows]),
+		    Typed = Table.TransformColumnTypes(Combined, {{"Cost centre", type text}, {"Account", type text}, {"Value", type number}},
+		        "en-US"),
+		    Result = Table.SelectColumns(Typed, {"Date", "Cost centre", "Account", "Scenario", "Value"})
+		in
+		    Result
+	lineageTag: da9c90dc-0017-5cc3-aebc-139f06b51de3
+
+	annotation PBI_ResultType = Table
+
+/// Staging, not loaded: the chart of accounts data/chart_of_accounts.csv.
+expression src_Accounts =
+		let
+		    Source = Csv.Document(File.Contents(DataFolder & "chart_of_accounts.csv"), [Delimiter = ",", Columns = 6, Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+		    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+		    Typed = Table.TransformColumnTypes(Promoted, {{"account", type text}, {"name", type text}, {"group", type text},
+		        {"subgroup", type text}, {"sign", Int64.Type}, {"sort_order", Int64.Type}}, "en-US"),
+		    Result = Table.RenameColumns(Typed, {{"account", "Account"}, {"name", "Account name"}, {"group", "Group"},
+		        {"subgroup", "Subgroup"}, {"sign", "Sign"}, {"sort_order", "Sort"}})
+		in
+		    Result
+	lineageTag: 231eae33-820a-5acc-a9dd-89ca84c1f8b2
+
+	annotation PBI_ResultType = Table
+
+/// Staging, not loaded: the cost centres and their heads, data/cost_centres.csv.
+expression src_CostCentres =
+		let
+		    Source = Csv.Document(File.Contents(DataFolder & "cost_centres.csv"), [Delimiter = ",", Columns = 6, Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+		    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+		    Typed = Table.TransformColumnTypes(Promoted, {{"cost_centre", type text}, {"name", type text}, {"type", type text},
+		        {"head_name", type text}, {"head_email", type text}, {"sort_order", Int64.Type}}, "en-US"),
+		    Result = Table.RenameColumns(Typed, {{"cost_centre", "Cost centre"}, {"name", "Name"}, {"type", "Type"},
+		        {"head_name", "Head name"}, {"head_email", "Head email"}, {"sort_order", "Sort"}})
+		in
+		    Result
+	lineageTag: a865ae29-3f6f-5b16-9380-086088ff007a
+
+	annotation PBI_ResultType = Table
+
+/// Staging, not loaded: the P&L layout data/pnl_layout.csv (empty group and bound become null).
+expression src_Layout =
+		let
+		    Source = Csv.Document(File.Contents(DataFolder & "pnl_layout.csv"), [Delimiter = ",", Columns = 7, Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+		    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+		    Nulls = Table.ReplaceValue(Promoted, "", null, Replacer.ReplaceValue, {"group", "bound"}),
+		    Typed = Table.TransformColumnTypes(Nulls, {{"line_key", type text}, {"line", type text}, {"line_type", type text},
+		        {"group", type text}, {"bound", Int64.Type}, {"sign", Int64.Type}, {"sort_order", Int64.Type}}, "en-US"),
+		    Result = Table.RenameColumns(Typed, {{"line_key", "Line key"}, {"line", "Line"}, {"line_type", "Line type"},
+		        {"group", "Group"}, {"bound", "Bound"}, {"sign", "Sign"}, {"sort_order", "Sort"}})
+		in
+		    Result
+	lineageTag: 00a70403-5fe2-58b0-9edf-86d7b7f6a485
+
+	annotation PBI_ResultType = Table
+
+/// Staging, not loaded: who sees which cost centre, data/security.csv (addresses in lower case).
+expression src_Security =
+		let
+		    Source = Csv.Document(File.Contents(DataFolder & "security.csv"), [Delimiter = ",", Columns = 2, Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+		    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+		    Typed = Table.TransformColumnTypes(Promoted, {{"user_email", type text}, {"cost_centre", type text}}, "en-US"),
+		    Lower = Table.TransformColumns(Typed, {{"user_email", Text.Lower, type text}}),
+		    Result = Table.RenameColumns(Lower, {{"user_email", "User email"}, {"cost_centre", "Cost centre"}})
+		in
+		    Result
+	lineageTag: dd2546dc-c6c9-58a3-bf5e-5e5f6d562ccd
+
+	annotation PBI_ResultType = Table

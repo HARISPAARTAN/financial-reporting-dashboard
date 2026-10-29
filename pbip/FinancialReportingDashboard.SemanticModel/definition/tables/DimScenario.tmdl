@@ -1,0 +1,33 @@
+/// The three scenarios: Actual, Budget and Forecast (the Q4 forecast made after the September close).
+table DimScenario
+	lineageTag: 317c28b0-a3aa-572b-a9d6-4d9f14cb6bac
+
+	column Scenario
+		dataType: string
+		lineageTag: b16470e9-a835-57f7-a02a-2f57840d23eb
+		summarizeBy: none
+		sourceColumn: Scenario
+		sortByColumn: 'Scenario sort'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Scenario sort'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: a22857a5-750e-5769-bbc2-a67eaa851824
+		summarizeBy: none
+		sourceColumn: Scenario sort
+
+		annotation SummarizationSetBy = User
+
+	partition DimScenario = m
+		mode: import
+		source =
+				let
+				    Source = #table(type table [Scenario = text, #"Scenario sort" = Int64.Type],
+				        {{"Actual", 1}, {"Budget", 2}, {"Forecast", 3}})
+				in
+				    Source
+
+	annotation PBI_ResultType = Table

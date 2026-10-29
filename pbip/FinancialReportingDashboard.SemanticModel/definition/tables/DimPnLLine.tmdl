@@ -1,0 +1,78 @@
+/// The ten lines of the management P&L: groups, subtotals and ratios (data/pnl_layout.csv).
+table DimPnLLine
+	lineageTag: 9d6fafe5-2137-5499-9aec-174a197042c0
+
+	column 'Line key'
+		dataType: string
+		isHidden
+		lineageTag: 2b7dcc53-5c2b-52f7-a146-fe5532d0fc6e
+		summarizeBy: none
+		sourceColumn: Line key
+
+		annotation SummarizationSetBy = Automatic
+
+	column Line
+		dataType: string
+		lineageTag: 6b7d0716-d10f-5f3b-af58-d210da2bdc8e
+		summarizeBy: none
+		sourceColumn: Line
+		sortByColumn: Sort
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Line type'
+		dataType: string
+		lineageTag: 683550c5-bf51-5ce9-ab4a-d6f206bc8730
+		summarizeBy: none
+		sourceColumn: Line type
+
+		annotation SummarizationSetBy = Automatic
+
+	column Group
+		dataType: string
+		isHidden
+		lineageTag: 5ddac4f1-4daa-5a50-9cb7-6fd363baae66
+		summarizeBy: none
+		sourceColumn: Group
+
+		annotation SummarizationSetBy = Automatic
+
+	column Bound
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 78ab32d7-f1f1-599f-ae86-f05b4a59fc6e
+		summarizeBy: none
+		sourceColumn: Bound
+
+		annotation SummarizationSetBy = User
+
+	column Sign
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 63da3134-7faf-565a-830d-9f328617d0da
+		summarizeBy: none
+		sourceColumn: Sign
+
+		annotation SummarizationSetBy = User
+
+	column Sort
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: a9add2e2-ef6b-5a79-84b6-2480ae750915
+		summarizeBy: none
+		sourceColumn: Sort
+
+		annotation SummarizationSetBy = User
+
+	partition DimPnLLine = m
+		mode: import
+		source =
+				let
+				    Source = src_Layout
+				in
+				    Source
+
+	annotation PBI_ResultType = Table

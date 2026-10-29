@@ -1,0 +1,68 @@
+/// Ledger actuals, budget and forecast in one table, signed as profit contribution (income +, expense -).
+table FactGL
+	lineageTag: 3056859b-2b0e-530e-a15a-57d31e2987e2
+
+	column Date
+		dataType: dateTime
+		isHidden
+		formatString: yyyy-mm-dd
+		lineageTag: 3ddb567f-334e-579f-851b-cae9eca0a2c6
+		summarizeBy: none
+		sourceColumn: Date
+
+		annotation SummarizationSetBy = User
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Cost centre'
+		dataType: string
+		isHidden
+		lineageTag: ed660cd3-4f80-5ef0-ba6b-2e464a32e306
+		summarizeBy: none
+		sourceColumn: Cost centre
+
+		annotation SummarizationSetBy = Automatic
+
+	column Account
+		dataType: string
+		isHidden
+		lineageTag: b357aaed-b805-5352-b2a6-0d9cfa460c6c
+		summarizeBy: none
+		sourceColumn: Account
+
+		annotation SummarizationSetBy = Automatic
+
+	column Scenario
+		dataType: string
+		isHidden
+		lineageTag: 865cca32-da20-507d-8f30-60b183d91ada
+		summarizeBy: none
+		sourceColumn: Scenario
+
+		annotation SummarizationSetBy = Automatic
+
+	column Amount
+		dataType: decimal
+		isHidden
+		formatString: #,0.00
+		lineageTag: e08cde74-0b8f-5b08-ad9d-ebf2fef61c73
+		summarizeBy: none
+		sourceColumn: Amount
+
+		annotation SummarizationSetBy = User
+
+	partition FactGL = m
+		mode: import
+		source =
+				let
+				    Budget = Table.NestedJoin(src_Budget, {"Account"}, src_Accounts, {"Account"}, "Chart", JoinKind.LeftOuter),
+				    WithSign = Table.ExpandTableColumn(Budget, "Chart", {"Sign"}),
+				    Signed = Table.AddColumn(WithSign, "Amount", each [Value] * [Sign], Currency.Type),
+				    Planned = Table.SelectColumns(Signed, {"Date", "Cost centre", "Account", "Scenario", "Amount"}),
+				    Combined = Table.Combine({src_GL, Planned}),
+				    Result = Table.TransformColumnTypes(Combined, {{"Date", type date}, {"Cost centre", type text}, {"Account", type text},
+				        {"Scenario", type text}, {"Amount", Currency.Type}}, "en-US")
+				in
+				    Result
+
+	annotation PBI_ResultType = Table

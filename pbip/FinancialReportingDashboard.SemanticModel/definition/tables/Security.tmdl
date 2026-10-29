@@ -1,0 +1,30 @@
+/// Row-level security: which cost centres each address sees (data/security.csv). Hidden, no relationship.
+table Security
+	isHidden
+	lineageTag: 3ca9272a-41a3-544a-b65a-721ec0bccdd6
+
+	column 'User email'
+		dataType: string
+		lineageTag: 3f5d0153-4a9d-5ccc-9c61-91e55519104b
+		summarizeBy: none
+		sourceColumn: User email
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Cost centre'
+		dataType: string
+		lineageTag: 47b0c2bd-dc7f-5c27-8f78-ce62a4655156
+		summarizeBy: none
+		sourceColumn: Cost centre
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Security = m
+		mode: import
+		source =
+				let
+				    Source = src_Security
+				in
+				    Source
+
+	annotation PBI_ResultType = Table

@@ -1,0 +1,29 @@
+model Model
+	culture: en-US
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	discourageImplicitMeasures
+	sourceQueryCulture: en-US
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 0
+
+annotation PBI_QueryOrder = ["DataFolder","StartDate","EndDate","src_GL","src_Budget","src_Accounts","src_CostCentres","src_Layout","src_Security","FactGL","DimDate","DimAccount","DimPnLLine","DimCostCentre","DimScenario","Security","PnLColumn","ReconCheck"]
+
+annotation PBI_ProTooling = ["DevMode"]
+
+ref table FactGL
+ref table DimDate
+ref table DimAccount
+ref table DimPnLLine
+ref table DimCostCentre
+ref table DimScenario
+ref table Security
+ref table PnLColumn
+ref table ReconCheck
+ref table _Measures
+
+ref role 'Department head'
+
+ref cultureInfo en-US
