@@ -1,0 +1,487 @@
+/* Financial Reporting Dashboard replica: layout and the few components the kit does not have. Colours come only
+   from the kit tokens (web/kit/tokens.css). */
+
+:root {
+  --max: 1280px;
+  --filters-h: 92px;
+  --row-tint: var(--surface-2);
+}
+
+/* light theme: a paler tint, so that the ok and warn variance texts keep 4.5:1 on it (tools/checks/contrast.mjs) */
+:root[data-theme="light"] {
+  --row-tint: color-mix(in srgb, var(--surface-2) 50%, var(--surface));
+}
+
+.app-loading,
+.app-error {
+  margin-top: var(--space-6);
+  color: var(--muted);
+}
+
+.app-error {
+  color: var(--danger);
+}
+
+.pf-brand__name {
+  overflow-wrap: anywhere;
+}
+
+.pf-header__tools {
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.pf-header__tools .pf-pill {
+  max-width: 100%;
+  white-space: normal;
+}
+
+/* an unfavourable variance is a warning, not an error: the kit's down colour is replaced by --warn */
+.pf-kpi__delta--down {
+  color: var(--warn);
+}
+
+/* ---------------------------------------------------------------- filter bar */
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 12px 16px;
+  margin-top: var(--space-4);
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+/* From 720 px the bar stays under the banner while the page scrolls; keyboard focus and anchors keep clear of both
+   (the bar is one row of about 84 px from 1100 px, two rows of about 150 px below that). Under 720 px the bar
+   scrolls away with the page, so nothing covers the focus there. */
+@media (min-width: 720px) {
+  .filters {
+    position: sticky;
+    top: calc(var(--pf-banner-h) + env(safe-area-inset-top));
+    z-index: 20;
+  }
+
+  :root:has(body.pf-has-banner) {
+    scroll-padding-top: calc(var(--pf-banner-h) + env(safe-area-inset-top) + var(--filters-h) + 8px);
+  }
+}
+
+@media (min-width: 720px) and (max-width: 1099.98px) {
+  :root {
+    --filters-h: 160px;
+  }
+}
+
+.f-field {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.f-field > .f-label {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.f-field .pf-select {
+  min-height: 36px;
+  font-size: 14px;
+}
+
+.f-months {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.f-spacer {
+  flex: 1;
+}
+
+.f-note {
+  max-width: 30ch;
+  min-height: 36px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+/* the department checkbox menu */
+.menu {
+  position: relative;
+}
+
+.menu > summary {
+  display: inline-flex;
+  align-items: center;
+  min-width: 12rem;
+  cursor: pointer;
+  list-style: none;
+}
+
+.menu > summary::-webkit-details-marker {
+  display: none;
+}
+
+.menu > summary::after {
+  content: "▾";
+  margin-left: auto;
+  padding-left: var(--space-2);
+  color: var(--muted);
+}
+
+.menu__list {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 4px);
+  left: 0;
+  display: grid;
+  gap: 2px;
+  min-width: 100%;
+  padding: var(--space-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.menu__list label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 36px;
+  padding: 0 var(--space-2);
+  border-radius: 6px;
+  font-size: 14px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.menu__list label:hover {
+  background: var(--surface-2);
+}
+
+.menu__list .menu__all {
+  border-bottom: 1px solid var(--border);
+  border-radius: 6px 6px 0 0;
+}
+
+.menu__list input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent);
+}
+
+/* segmented control (Scenario) */
+.segctl {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 3px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface-2);
+}
+
+.segctl button {
+  min-height: 30px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.segctl button[aria-pressed="true"] {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 0 0 1px var(--border);
+}
+
+/* ---------------------------------------------------------------- tiles, cards, charts */
+
+.kpis {
+  --min: 200px;
+  margin-top: var(--space-4);
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+  gap: var(--space-4);
+  margin-top: var(--space-4);
+}
+
+.layout .pf-card,
+.wide.pf-card {
+  padding: 18px 20px;
+}
+
+.wide {
+  margin-top: var(--space-4);
+}
+
+.ct {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px 12px;
+  margin-bottom: var(--space-3);
+}
+
+.ct h2 {
+  font-size: 16px;
+  letter-spacing: 0;
+}
+
+.ct .sub {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.chart {
+  width: 100%;
+  height: 270px;
+}
+
+.chart--tall {
+  height: 420px;
+}
+
+.hint {
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: var(--fs-xs);
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  margin-top: var(--space-1);
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.legend i {
+  display: inline-block;
+  width: 14px;
+  height: 10px;
+  margin-right: 6px;
+  border-radius: 2px;
+  vertical-align: middle;
+}
+
+.legend i.ok {
+  background: var(--ok);
+}
+
+.legend i.warn {
+  background: var(--warn);
+}
+
+.legend i.acc {
+  background: var(--accent);
+}
+
+.pick {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.pick .pf-select {
+  min-height: 36px;
+}
+
+/* ---------------------------------------------------------------- tables */
+
+.table-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.pnl th,
+.pnl td,
+.vtable th,
+.vtable td {
+  padding: 8px 10px;
+}
+
+/* no zebra rows: the tint marks the subtotal and ratio lines, as [Row tint] does in the report */
+.pf-table.pnl tbody tr:nth-child(n) > *,
+.pf-table.vtable tbody tr:nth-child(n) > * {
+  background: var(--surface);
+}
+
+.pnl tbody th,
+.vtable tbody th {
+  position: sticky;
+  left: 0;
+  top: auto;
+  z-index: 1;
+  color: var(--text);
+  font-family: var(--font-text);
+  font-size: var(--fs-sm);
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.pf-table.pnl tbody tr.is-sub:nth-child(n) > *,
+.pf-table.vtable tbody tr.is-sub:nth-child(n) > * {
+  background: var(--row-tint);
+  font-weight: 600;
+}
+
+.pnl th.lvl1 {
+  padding-left: 28px;
+}
+
+.pnl th.lvl2 {
+  padding-left: 46px;
+  color: var(--muted);
+}
+
+.rowtoggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 28px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.rowtoggle::before {
+  content: "▸";
+  display: inline-block;
+  width: 1ch;
+  color: var(--accent);
+}
+
+.rowtoggle[aria-expanded="true"]::before {
+  content: "▾";
+}
+
+.fav1 {
+  color: var(--ok);
+}
+
+.fav-1 {
+  color: var(--warn);
+}
+
+.narrow-only {
+  display: none;
+}
+
+/* ---------------------------------------------------------------- About and store note */
+
+.store-note {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  margin-top: var(--space-4);
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.about {
+  display: grid;
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+}
+
+.about h2 {
+  font-size: var(--fs-lg);
+}
+
+.about h3 {
+  margin-top: var(--space-2);
+  font-size: var(--fs-md);
+}
+
+.about p {
+  max-width: 80ch;
+  color: var(--muted);
+  font-size: var(--fs-sm);
+}
+
+.about a {
+  color: var(--text);
+  text-decoration-color: var(--accent);
+}
+
+/* ---------------------------------------------------------------- narrow screens */
+
+@media (max-width: 899.98px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 719.98px) {
+  .narrow-only {
+    display: inline-flex;
+  }
+
+  /* Line, YTD and Full year; "Show months" opens the months inside the scrolling table container */
+  .pnl-wrap:not(.show-months) .m {
+    display: none;
+  }
+
+  .chart--tall {
+    height: 320px;
+  }
+}
+
+@media (max-width: 599.98px) {
+  .kpis {
+    --min: 150px;
+  }
+
+  .pf-kpi {
+    padding: 12px 14px;
+  }
+
+  .pf-kpi__value {
+    font-size: 22px;
+  }
+
+  .filters {
+    padding: 10px 14px;
+  }
+
+  .menu > summary {
+    min-width: 10rem;
+  }
+
+  .pnl th.lvl1 {
+    padding-left: 24px;
+  }
+
+  .pnl th.lvl2 {
+    padding-left: 36px;
+  }
+}

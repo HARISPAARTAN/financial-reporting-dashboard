@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Financial Reporting Dashboard · Kaldora Facility Services (demo)</title>
+  <link rel="icon" href="data:,">
+  <meta name="description" content="HTML replica of a Power BI management P&amp;L for Kaldora Facility Services, a fictional facility-services company. Invented data.">
+  <script src="kit/theme-boot.js"></script>
+  <link rel="stylesheet" href="kit/fonts/fonts.css">
+  <link rel="stylesheet" href="kit/tokens.css">
+  <link rel="stylesheet" href="kit/base.css">
+  <link rel="stylesheet" href="assets/styles.css">
+  <script src="vendor/echarts.min.js" defer></script>
+  <script type="module" src="assets/app.js"></script>
+</head>
+<body>
+  <div class="pf-page" id="app" data-state="loading">
+    <header class="pf-header">
+      <a class="pf-brand" href="#pnl"><span class="pf-brand__mark" aria-hidden="true">KF</span><span class="pf-brand__name">Kaldora Facility Services · Financial reporting</span></a>
+      <div class="pf-header__tools">
+        <span class="pf-pill pf-pill--muted" id="data-as-of">Data as of –</span>
+        <span id="theme-toggle"></span>
+      </div>
+    </header>
+
+    <nav aria-label="Report pages">
+      <div class="pf-tabs" role="tablist" aria-label="Report pages" id="tabs">
+        <button type="button" class="pf-tab" role="tab" id="tab-pnl" aria-controls="panel-pnl" aria-selected="true">P&amp;L statement</button>
+        <button type="button" class="pf-tab" role="tab" id="tab-variance" aria-controls="panel-variance" aria-selected="false">Variance</button>
+        <button type="button" class="pf-tab" role="tab" id="tab-trend" aria-controls="panel-trend" aria-selected="false">Trend</button>
+      </div>
+    </nav>
+
+    <section class="filters" id="filters" aria-label="Filters">
+      <div class="f-field">
+        <label class="f-label" for="year">Year</label>
+        <select class="pf-select" id="year"></select>
+      </div>
+      <div class="f-field" role="group" aria-labelledby="f-months">
+        <span class="f-label" id="f-months">Months</span>
+        <div class="f-months">
+          <select class="pf-select" id="month-from" aria-label="First month"></select>
+          <span class="pf-label" aria-hidden="true">to</span>
+          <select class="pf-select" id="month-to" aria-label="Last month"></select>
+        </div>
+      </div>
+      <div class="f-field">
+        <span class="f-label" id="f-department">Department</span>
+        <details class="menu" id="department-menu">
+          <summary class="pf-select" aria-labelledby="f-department department-label"><span id="department-label">All departments</span></summary>
+          <div class="menu__list" role="group" aria-labelledby="f-department" id="department-list"></div>
+        </details>
+      </div>
+      <div class="f-field" id="scenario-field">
+        <span class="f-label" id="f-scenario">Scenario</span>
+        <div class="segctl" role="group" aria-labelledby="f-scenario" id="scenario"></div>
+        <p class="f-note" id="scenario-note" hidden>Scenario applies to the P&amp;L table only.</p>
+      </div>
+      <div class="f-spacer"></div>
+      <button type="button" class="pf-btn pf-btn--sm" id="reset">Reset</button>
+    </section>
+
+    <main>
+      <p class="app-loading" id="loading">Loading the data…</p>
+
+      <section class="pf-tabpanel" role="tabpanel" id="panel-pnl" aria-labelledby="tab-pnl">
+        <div class="pf-grid kpis" id="pnl-tiles"></div>
+        <article class="pf-card wide">
+          <div class="ct">
+            <div>
+              <h2>P&amp;L statement · EUR thousand</h2>
+              <p class="sub" id="pnl-sub">Full year: the budget when Budget is selected, otherwise actuals to date plus forecast.</p>
+            </div>
+            <div class="table-tools">
+              <button type="button" class="pf-btn pf-btn--ghost pf-btn--sm" id="expand-all">Expand all</button>
+              <button type="button" class="pf-btn pf-btn--ghost pf-btn--sm" id="collapse-all">Collapse all</button>
+              <button type="button" class="pf-btn pf-btn--ghost pf-btn--sm narrow-only" id="show-months" aria-pressed="false" aria-controls="pnl-table">Show months</button>
+            </div>
+          </div>
+          <div class="pf-table-wrap pnl-wrap" id="pnl-wrap" tabindex="0" role="region" aria-label="P&amp;L statement">
+            <table class="pf-table pnl" id="pnl-table"><thead><tr></tr></thead><tbody></tbody></table>
+          </div>
+        </article>
+      </section>
+
+      <section class="pf-tabpanel" role="tabpanel" id="panel-variance" aria-labelledby="tab-variance" hidden>
+        <div class="layout">
+          <div class="pf-stack" style="gap:16px">
+            <article class="pf-card">
+              <div class="ct"><h2>EBITDA variance to budget by department</h2><span class="sub">profit impact, EUR thousand, closed months</span></div>
+              <div class="chart" id="chart-departments" role="img" aria-label="Bar chart: EBITDA profit impact against the budget by department"></div>
+              <p class="hint" id="departments-hint">Click a bar to filter the waterfall and the table; click it again to clear</p>
+            </article>
+            <article class="pf-card">
+              <div class="ct"><h2>From budget EBIT to actual EBIT by account group</h2><span class="sub" id="waterfall-sub">all departments</span></div>
+              <div class="chart" id="chart-waterfall" role="img" aria-label="Waterfall chart: profit impact of the four account groups and the EBIT variance"></div>
+              <div class="legend"><span><i class="ok"></i>Raises profit</span><span><i class="warn"></i>Lowers profit</span><span><i class="acc"></i>EBIT variance</span></div>
+            </article>
+          </div>
+          <article class="pf-card">
+            <div class="ct"><h2>Variance by line</h2><span class="sub" id="variance-sub">all departments · EUR thousand</span></div>
+            <div class="pf-table-wrap" tabindex="0" role="region" aria-label="Variance by line">
+              <table class="pf-table vtable" id="variance-table">
+                <thead><tr><th scope="col">Line</th><th scope="col" class="pf-num">Actual</th><th scope="col" class="pf-num">Budget</th><th scope="col" class="pf-num">Variance</th><th scope="col" class="pf-num">Variance %</th><th scope="col">Status</th></tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+            <p class="hint">Budget: the closed months only. Variance in display sign, margins in percentage points; on plan within 1 % or 0.1 pp.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="pf-tabpanel" role="tabpanel" id="panel-trend" aria-labelledby="tab-trend" hidden>
+        <article class="pf-card wide">
+          <div class="ct">
+            <h2>Monthly actual, budget and forecast</h2>
+            <label class="pick">P&amp;L line <select class="pf-select" id="line"></select></label>
+          </div>
+          <div class="chart chart--tall" id="chart-trend" role="img" aria-label="Line chart: actual, budget and forecast of the selected line by month, January 2023 to December 2025"></div>
+          <p class="hint">Department applies here; Year and Months do not: the chart always shows January 2023 to December 2025.</p>
+        </article>
+      </section>
+
+      <p class="store-note" id="store-note">
+        <span>The filters, the tab, the expanded rows and the line are remembered in this browser only.</span>
+        <button type="button" class="pf-btn pf-btn--ghost pf-btn--sm" id="forget">Forget the saved view</button>
+      </p>
+
+      <section class="pf-card about" id="about" aria-labelledby="about-title">
+        <h2 id="about-title">About this demo</h2>
+        <p>Kaldora Facility Services is a fictional facility-services company in Graz, Austria, with four service lines (Cleaning Services, Technical Maintenance, Security Services, Catering) and two support departments (Administration, Sales &amp; Marketing). The finance team wanted one management P&amp;L instead of the monthly spreadsheet: actuals against budget by department, a forecast for the rest of the year and the variances worth explaining.</p>
+        <h3>Sign convention</h3>
+        <p>The ledger export uses the ledger sign: debit plus, credit minus. The model stores every amount as its contribution to profit: income plus, expense minus. Revenue and cost lines show in display sign, so costs appear as positive amounts. A variance is favourable when it raises profit: more revenue or less cost.</p>
+        <h3>The Power BI report</h3>
+        <p>This page computes the measures of the report in JavaScript from <code>kaldora.json</code>, built by <code>tools/build_replica_data.py</code> through the Python reference. The report also has an Opex page, a department drill-through, a tooltip page and a role <code>Department head</code> that limits each department head to their own cost centres; this replica shows all departments and leaves those out.</p>
+        <p>Kaldora Facility Services is a fictional company and every number is invented.</p>
+        <p><a href="https://github.com/HARISPAARTAN/financial-reporting-dashboard">Source code on GitHub</a></p>
+        <p>Rebuilt from memory as a demo. The original client's name and data are not used.</p>
+      </section>
+    </main>
+
+    <footer class="pf-footer">
+      <p>Rebuilt from memory as a demo. The original client's name and data are not used.</p>
+      <p>Financial Reporting Dashboard · MIT · ECharts Apache-2.0 · <a href="https://github.com/HARISPAARTAN/financial-reporting-dashboard">Source code</a></p>
+    </footer>
+  </div>
+</body>
+</html>
