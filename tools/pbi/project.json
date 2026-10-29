@@ -1,0 +1,41 @@
+{
+  "name": "FinancialReportingDashboard",
+  "folder": "pbip",
+  "namespace": "frd",
+  "generated": "frd:generated",
+  "alt_prefix": {
+    "card": "Card",
+    "tableEx": "Table",
+    "pivotTable": "Matrix",
+    "slicer": "Slicer",
+    "actionButton": "Button",
+    "*": "Chart"
+  },
+  "theme": {
+    "name": "Kaldora Dark",
+    "file": "kaldora-dark.json",
+    "tokens": "web/kit/tokens.css",
+    "font": "Segoe UI",
+    "font_bold": "Segoe UI Semibold",
+    "display_units": "none"
+  },
+  "diagram": [
+    ["DimDate", "DimCostCentre", "DimScenario", "DimAccount"],
+    ["FactGL", "DimPnLLine"],
+    ["_Measures", "PnLColumn", "ReconCheck", "Security"]
+  ],
+  "public_variant": {
+    "suffix": " (public)",
+    "drop_tables": ["Security"],
+    "readme": [
+      "Financial Reporting Dashboard, public variant",
+      "",
+      "This copy of the Power BI project has no row-level security: the role \"Department head\" and the",
+      "Security table are removed. Model and report are otherwise unchanged (tables, relationships, measures,",
+      "pages). It is the copy that Publish to web would use; the data are invented for a fictional company.",
+      "",
+      "Built with: uv run python tools/pbi/make_public_variant.py",
+      "The project under pbip/ keeps the role for the row-level security demonstration."
+    ]
+  }
+}
