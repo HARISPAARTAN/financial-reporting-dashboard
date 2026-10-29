@@ -1,0 +1,220 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
+  "filterConfig": {
+    "filters": [
+      {
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "DimPnLLine"
+              }
+            },
+            "Property": "Line type"
+          }
+        },
+        "filter": {
+          "From": [
+            {
+              "Entity": "DimPnLLine",
+              "Name": "f0",
+              "Type": 0
+            }
+          ],
+          "Version": 2,
+          "Where": [
+            {
+              "Condition": {
+                "In": {
+                  "Expressions": [
+                    {
+                      "Column": {
+                        "Expression": {
+                          "SourceRef": {
+                            "Source": "f0"
+                          }
+                        },
+                        "Property": "Line type"
+                      }
+                    }
+                  ],
+                  "Values": [
+                    [
+                      {
+                        "Literal": {
+                          "Value": "'Group'"
+                        }
+                      }
+                    ]
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        "name": "1dd244332b52500598b7",
+        "type": "Categorical"
+      }
+    ]
+  },
+  "name": "8bc2087c0dff5635852f",
+  "position": {
+    "height": 240,
+    "tabOrder": 12,
+    "width": 500,
+    "x": 16,
+    "y": 464,
+    "z": 12
+  },
+  "visual": {
+    "drillFilterOtherVisuals": true,
+    "objects": {
+      "labels": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "sentimentColors": [
+        {
+          "properties": {
+            "decreaseFill": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#FACC15'"
+                    }
+                  }
+                }
+              }
+            },
+            "increaseFill": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#3DDC97'"
+                    }
+                  }
+                }
+              }
+            },
+            "totalFill": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#F2A93B'"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "active": true,
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DimPnLLine"
+                    }
+                  },
+                  "Property": "Line"
+                }
+              },
+              "nativeQueryRef": "Line",
+              "queryRef": "DimPnLLine.Line"
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Profit impact"
+                }
+              },
+              "nativeQueryRef": "Profit impact",
+              "queryRef": "_Measures.Profit impact"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "direction": "Ascending",
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "DimPnLLine"
+                  }
+                },
+                "Property": "Line"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "visualContainerObjects": {
+      "general": [
+        {
+          "properties": {
+            "altText": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Chart: From budget EBIT to actual EBIT by account group'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'From budget EBIT to actual EBIT by account group'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualType": "waterfallChart"
+  }
+}

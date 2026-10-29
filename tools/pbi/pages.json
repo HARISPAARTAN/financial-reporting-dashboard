@@ -1,0 +1,501 @@
+{
+  "canvas": {"width": 1280, "height": 720},
+  "header": {
+    "title": {"text": "Kaldora Facility Services · {page}", "x": 16, "y": 4, "w": 640, "h": 44, "size": 14},
+    "visuals": [
+      {
+        "type": "card",
+        "x": 668,
+        "y": 4,
+        "w": 372,
+        "h": 44,
+        "title": "Data as of",
+        "title_hidden": true,
+        "bare": true,
+        "label_size": 10,
+        "label_colour": "muted",
+        "roles": {"Values": [["_Measures", "Data as of", "Measure"]]}
+      }
+    ]
+  },
+  "slicer_row": {"y": 56, "h": 48},
+  "slicers": {
+    "Year": {"x": 16, "w": 140, "field": ["DimDate", "Year"], "mode": "Dropdown", "single": true, "default": [2025]},
+    "Months": {"x": 168, "w": 280, "field": ["DimDate", "Month number"], "mode": "Between"},
+    "Department": {"x": 460, "w": 260, "field": ["DimCostCentre", "Name"], "mode": "Dropdown", "select_all": true},
+    "Scenario": {
+      "x": 732,
+      "w": 300,
+      "field": ["DimScenario", "Scenario"],
+      "mode": "Basic",
+      "tiles": true,
+      "single": true,
+      "default": ["Actual"]
+    },
+    "P&L line": {"x": 732, "w": 300, "field": ["DimPnLLine", "Line"], "mode": "Dropdown", "single": true, "default": ["EBITDA"]}
+  },
+  "reset": {"x": 1164, "y": 10, "w": 100, "h": 32, "label": "Reset", "group": "Reset filters"},
+  "tiles": {"x": 16, "w": 1248, "gutter": 12, "y": 116, "h": 84, "value_h": 48, "measures": "_Measures", "delta_label": "vs budget"},
+  "pages": [
+    {
+      "id": "pnl-statement",
+      "displayName": "P&L statement",
+      "slicers": ["Year", "Months", "Department", "Scenario"],
+      "tiles": [
+        {"measure": "Actual", "label": "Revenue", "filters": [{"field": ["DimPnLLine", "Line key"], "in": ["REV"]}], "delta_measure": "Variance %", "delta_colour": "Favourable colour"},
+        {"measure": "Actual", "label": "Gross margin %", "filters": [{"field": ["DimPnLLine", "Line key"], "in": ["GPM"]}], "delta_measure": "Variance", "delta_colour": "Favourable colour"},
+        {"measure": "Actual", "label": "EBITDA", "filters": [{"field": ["DimPnLLine", "Line key"], "in": ["EBITDA"]}], "delta_measure": "Variance %", "delta_colour": "Favourable colour"},
+        {"measure": "Actual", "label": "EBITDA margin %", "filters": [{"field": ["DimPnLLine", "Line key"], "in": ["EBITDAM"]}], "delta_measure": "Variance", "delta_colour": "Favourable colour"},
+        {"measure": "Actual", "label": "EBIT", "filters": [{"field": ["DimPnLLine", "Line key"], "in": ["EBIT"]}], "delta_measure": "Variance %", "delta_colour": "Favourable colour"}
+      ],
+      "visuals": [
+        {
+          "key": "matrix",
+          "type": "pivotTable",
+          "x": 16,
+          "y": 212,
+          "w": 1248,
+          "h": 492,
+          "title": "P&L statement · EUR thousand",
+          "subtitle": "Full year: the budget when Budget is selected, otherwise actuals to date plus forecast.",
+          "roles": {
+            "Rows": [["DimPnLLine", "Line", "Column"], ["DimAccount", "Subgroup", "Column"], ["DimAccount", "Account label", "Column"]],
+            "Columns": [["PnLColumn", "Column", "Column"]],
+            "Values": [["_Measures", "P&L Matrix", "Measure"]]
+          },
+          "matrix": {"stepped": true, "icons": true, "subtotals": "Top"},
+          "back_by": {"measure": ["_Measures", "Row tint"], "fields": [["_Measures", "P&L Matrix"]]},
+          "reset": "collapse"
+        }
+      ],
+      "interactions": [
+        {"source": "slicer:Scenario", "targets": ["tiles"]},
+        {"source": "matrix", "targets": "*"}
+      ]
+    },
+    {
+      "id": "variance-analysis",
+      "displayName": "Variance analysis",
+      "slicers": ["Year", "Months", "Department"],
+      "tiles": [
+        {"measure": "Budget (closed months)", "label": "Budget EBIT", "filters": [{"field": ["DimPnLLine", "Line key"], "in": ["EBIT"]}]},
+        {"measure": "Actual", "label": "Actual EBIT", "filters": [{"field": ["DimPnLLine", "Line key"], "in": ["EBIT"]}]},
+        {"measure": "Variance", "label": "EBIT variance", "filters": [{"field": ["DimPnLLine", "Line key"], "in": ["EBIT"]}], "colour_by": "Favourable colour", "delta_measure": "Variance %", "delta_colour": "Favourable colour"},
+        {"measure": "Outlook vs budget", "label": "Full-year outlook vs budget", "filters": [{"field": ["DimPnLLine", "Line key"], "in": ["EBIT"]}]}
+      ],
+      "visuals": [
+        {
+          "key": "bars",
+          "type": "clusteredBarChart",
+          "x": 16,
+          "y": 212,
+          "w": 500,
+          "h": 240,
+          "title": "EBITDA variance to budget by department",
+          "roles": {"Category": [["DimCostCentre", "Name", "Column"]], "Y": [["_Measures", "Profit impact", "Measure"]]},
+          "filters": [{"field": ["DimPnLLine", "Line key"], "in": ["EBITDA"]}],
+          "sort": {"field": ["DimCostCentre", "Name", "Column"], "direction": "Ascending"},
+          "fill_by": ["_Measures", "Favourable colour"],
+          "data_labels": true,
+          "tooltip_page": "line-tooltip",
+          "reset": "remove"
+        },
+        {
+          "key": "waterfall",
+          "type": "waterfallChart",
+          "x": 16,
+          "y": 464,
+          "w": 500,
+          "h": 240,
+          "title": "From budget EBIT to actual EBIT by account group",
+          "roles": {"Category": [["DimPnLLine", "Line", "Column"]], "Y": [["_Measures", "Profit impact", "Measure"]]},
+          "filters": [{"field": ["DimPnLLine", "Line type"], "in": ["Group"]}],
+          "sort": {"field": ["DimPnLLine", "Line", "Column"], "direction": "Ascending"},
+          "sentiment": {"increase": "ok", "decrease": "warn", "total": "accent"},
+          "data_labels": true
+        },
+        {
+          "key": "matrix",
+          "type": "pivotTable",
+          "x": 528,
+          "y": 212,
+          "w": 736,
+          "h": 492,
+          "title": "Variance by line",
+          "roles": {
+            "Rows": [["DimPnLLine", "Line", "Column"], ["DimAccount", "Subgroup", "Column"], ["DimAccount", "Account label", "Column"]],
+            "Values": [
+              ["_Measures", "Actual", "Measure"],
+              ["_Measures", "Budget (closed months)", "Measure"],
+              ["_Measures", "Variance", "Measure"],
+              ["_Measures", "Variance %", "Measure"],
+              ["_Measures", "Favourable label", "Measure", "Status"]
+            ]
+          },
+          "matrix": {"stepped": true, "icons": true, "subtotals": "Top"},
+          "font_by": {
+            "measure": ["_Measures", "Favourable colour"],
+            "fields": [["_Measures", "Variance"], ["_Measures", "Variance %"], ["_Measures", "Favourable label"]]
+          },
+          "back_by": {
+            "measure": ["_Measures", "Row tint"],
+            "fields": [["_Measures", "Actual"], ["_Measures", "Budget (closed months)"]]
+          },
+          "reset": "collapse"
+        }
+      ],
+      "interactions": [
+        {"source": "waterfall", "targets": ["bars", "tiles"]},
+        {"source": "matrix", "targets": "*"}
+      ]
+    },
+    {
+      "id": "trend",
+      "displayName": "Trend",
+      "slicers": ["Department", "P&L line"],
+      "visuals": [
+        {
+          "key": "monthly",
+          "type": "lineChart",
+          "x": 16,
+          "y": 116,
+          "w": 1248,
+          "h": 292,
+          "title": "Monthly actual, budget and forecast",
+          "roles": {
+            "Category": [["DimDate", "Month start", "Column"]],
+            "Y": [["_Measures", "Actual", "Measure"], ["_Measures", "Budget", "Measure"], ["_Measures", "Forecast", "Measure"]]
+          },
+          "sort": {"field": ["DimDate", "Month start", "Column"], "direction": "Ascending"},
+          "lines": [
+            {"field": ["_Measures", "Actual"], "colour": "chart-1"},
+            {"field": ["_Measures", "Budget"], "colour": "muted", "style": "dashed"},
+            {"field": ["_Measures", "Forecast"], "colour": "accent", "style": "dotted"}
+          ],
+          "tooltip_page": "line-tooltip"
+        },
+        {
+          "key": "cumulative",
+          "type": "lineChart",
+          "x": 16,
+          "y": 420,
+          "w": 618,
+          "h": 284,
+          "title": "Cumulative within each year",
+          "roles": {
+            "Category": [["DimDate", "Month start", "Column"]],
+            "Y": [["_Measures", "Actual YTD", "Measure"], ["_Measures", "Budget YTD", "Measure"], ["_Measures", "Outlook YTD", "Measure"]]
+          },
+          "sort": {"field": ["DimDate", "Month start", "Column"], "direction": "Ascending"},
+          "lines": [
+            {"field": ["_Measures", "Actual YTD"], "colour": "chart-1"},
+            {"field": ["_Measures", "Budget YTD"], "colour": "muted", "style": "dashed"},
+            {"field": ["_Measures", "Outlook YTD"], "colour": "accent", "style": "dotted"}
+          ]
+        },
+        {
+          "key": "fullyear",
+          "type": "clusteredColumnChart",
+          "x": 646,
+          "y": 420,
+          "w": 618,
+          "h": 284,
+          "title": "Full year: outlook against budget",
+          "roles": {
+            "Category": [["DimDate", "Year", "Column"]],
+            "Y": [["_Measures", "Full-year outlook", "Measure"], ["_Measures", "Budget full year", "Measure"]]
+          },
+          "sort": {"field": ["DimDate", "Year", "Column"], "direction": "Ascending"},
+          "lines": [
+            {"field": ["_Measures", "Full-year outlook"], "colour": "accent"},
+            {"field": ["_Measures", "Budget full year"], "colour": "muted"}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "opex",
+      "displayName": "Opex",
+      "slicers": ["Year", "Months", "Department"],
+      "tiles": [
+        {"measure": "Actual", "label": "Operating expenses", "filters": [{"field": ["DimPnLLine", "Line key"], "in": ["OPEX"]}]},
+        {"measure": "Variance %", "label": "Opex against budget", "filters": [{"field": ["DimPnLLine", "Line key"], "in": ["OPEX"]}], "colour_by": "Favourable colour"},
+        {"measure": "Opex % of revenue"},
+        {"measure": "Personnel cost % of revenue"}
+      ],
+      "visuals": [
+        {
+          "key": "treemap",
+          "type": "treemap",
+          "x": 16,
+          "y": 212,
+          "w": 500,
+          "h": 240,
+          "title": "Operating expenses by subgroup and account",
+          "roles": {
+            "Group": [["DimAccount", "Subgroup", "Column"]],
+            "Details": [["DimAccount", "Account label", "Column"]],
+            "Values": [["_Measures", "Actual", "Measure"]]
+          },
+          "filters": [{"field": ["DimPnLLine", "Line key"], "in": ["OPEX"]}]
+        },
+        {
+          "key": "bars",
+          "type": "clusteredBarChart",
+          "x": 16,
+          "y": 464,
+          "w": 500,
+          "h": 240,
+          "title": "Operating expenses by department",
+          "roles": {
+            "Category": [["DimCostCentre", "Name", "Column"]],
+            "Y": [["_Measures", "Actual", "Measure"], ["_Measures", "Budget (closed months)", "Measure"]]
+          },
+          "filters": [{"field": ["DimPnLLine", "Line key"], "in": ["OPEX"]}],
+          "sort": {"field": ["DimCostCentre", "Name", "Column"], "direction": "Ascending"},
+          "lines": [
+            {"field": ["_Measures", "Actual"], "colour": "chart-1"},
+            {"field": ["_Measures", "Budget (closed months)"], "colour": "muted"}
+          ]
+        },
+        {
+          "key": "table",
+          "type": "tableEx",
+          "x": 528,
+          "y": 212,
+          "w": 736,
+          "h": 492,
+          "title": "Largest opex variances",
+          "roles": {
+            "Values": [
+              ["DimAccount", "Account label", "Column", "Account"],
+              ["DimCostCentre", "Name", "Column", "Department"],
+              ["_Measures", "Actual", "Measure"],
+              ["_Measures", "Budget (closed months)", "Measure"],
+              ["_Measures", "Variance", "Measure"],
+              ["_Measures", "Variance %", "Measure"],
+              ["_Measures", "Favourable label", "Measure", "Status"]
+            ]
+          },
+          "filters": [{"field": ["DimPnLLine", "Line key"], "in": ["OPEX"]}],
+          "top_n": {"field": ["DimAccount", "Account label"], "by": ["_Measures", "Variance", "Measure"], "n": 10},
+          "sort": {"field": ["_Measures", "Variance", "Measure"], "direction": "Descending"},
+          "font_by": {
+            "measure": ["_Measures", "Favourable colour"],
+            "fields": [["_Measures", "Variance"], ["_Measures", "Variance %"], ["_Measures", "Favourable label"]]
+          }
+        }
+      ]
+    },
+    {
+      "id": "department-detail",
+      "displayName": "Department detail",
+      "drillthrough": {"field": ["DimCostCentre", "Name"]},
+      "back": {"x": 1052, "y": 10, "w": 100, "h": 32, "label": "Back"},
+      "slicers": ["Year", "Months"],
+      "tiles": [
+        {"measure": "Actual", "label": "Revenue", "filters": [{"field": ["DimPnLLine", "Line key"], "in": ["REV"]}], "delta_measure": "Variance %", "delta_colour": "Favourable colour"},
+        {"measure": "Actual", "label": "Gross margin %", "filters": [{"field": ["DimPnLLine", "Line key"], "in": ["GPM"]}], "delta_measure": "Variance", "delta_colour": "Favourable colour"},
+        {"measure": "Actual", "label": "EBITDA", "filters": [{"field": ["DimPnLLine", "Line key"], "in": ["EBITDA"]}], "delta_measure": "Variance %", "delta_colour": "Favourable colour"},
+        {"measure": "Actual", "label": "EBITDA margin %", "filters": [{"field": ["DimPnLLine", "Line key"], "in": ["EBITDAM"]}], "delta_measure": "Variance", "delta_colour": "Favourable colour"}
+      ],
+      "visuals": [
+        {
+          "key": "department",
+          "type": "card",
+          "x": 460,
+          "y": 56,
+          "w": 400,
+          "h": 48,
+          "title": "Selected department",
+          "title_hidden": true,
+          "bare": true,
+          "label_size": 14,
+          "roles": {"Values": [["_Measures", "Selected department", "Measure"]]}
+        },
+        {
+          "key": "head",
+          "type": "card",
+          "x": 872,
+          "y": 56,
+          "w": 392,
+          "h": 48,
+          "title": "Department head",
+          "title_hidden": true,
+          "bare": true,
+          "label_size": 11,
+          "label_colour": "muted",
+          "roles": {"Values": [["_Measures", "Department head", "Measure"]]}
+        },
+        {
+          "key": "matrix",
+          "type": "pivotTable",
+          "x": 16,
+          "y": 212,
+          "w": 800,
+          "h": 492,
+          "title": "Department P&L",
+          "roles": {
+            "Rows": [["DimPnLLine", "Line", "Column"], ["DimAccount", "Subgroup", "Column"], ["DimAccount", "Account label", "Column"]],
+            "Values": [
+              ["_Measures", "Actual", "Measure"],
+              ["_Measures", "Budget (closed months)", "Measure"],
+              ["_Measures", "Variance", "Measure"],
+              ["_Measures", "Variance %", "Measure"],
+              ["_Measures", "Full-year outlook", "Measure"],
+              ["_Measures", "Budget full year", "Measure"]
+            ]
+          },
+          "matrix": {"stepped": true, "icons": true, "subtotals": "Top"},
+          "font_by": {"measure": ["_Measures", "Favourable colour"], "fields": [["_Measures", "Variance"], ["_Measures", "Variance %"]]},
+          "back_by": {
+            "measure": ["_Measures", "Row tint"],
+            "fields": [["_Measures", "Actual"], ["_Measures", "Budget (closed months)"], ["_Measures", "Full-year outlook"], ["_Measures", "Budget full year"]]
+          },
+          "reset": "collapse"
+        },
+        {
+          "key": "trend",
+          "type": "lineChart",
+          "x": 828,
+          "y": 212,
+          "w": 436,
+          "h": 492,
+          "title": "EBITDA by month",
+          "roles": {
+            "Category": [["DimDate", "Month start", "Column"]],
+            "Y": [["_Measures", "Actual", "Measure"], ["_Measures", "Budget", "Measure"]]
+          },
+          "filters": [{"field": ["DimPnLLine", "Line key"], "in": ["EBITDA"]}],
+          "sort": {"field": ["DimDate", "Month start", "Column"], "direction": "Ascending"},
+          "lines": [
+            {"field": ["_Measures", "Actual"], "colour": "chart-1"},
+            {"field": ["_Measures", "Budget"], "colour": "muted", "style": "dashed"}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "info",
+      "displayName": "Info",
+      "visuals": [
+        {
+          "type": "textbox",
+          "x": 16,
+          "y": 56,
+          "w": 616,
+          "h": 300,
+          "card": true,
+          "alt": "What this report shows",
+          "paragraphs": [
+            {"text": "What this report shows", "size": 12, "bold": true},
+            "A management P&L for Kaldora Facility Services, a facility-services company in Graz with four service lines (Cleaning Services, Technical Maintenance, Security Services, Catering) and two support departments (Administration, Sales & Marketing).",
+            "Pages: the P&L statement with months, YTD and full year; the variance to budget by department and account group; the monthly trend; operating expenses; and the detail of one department (right-click a department bar, Drill through).",
+            {"text": "Kaldora Facility Services is a fictional company and every number is invented.", "colour": "muted"},
+            {"text": "Rebuilt from memory as a demo. The original client's name and data are not used.", "colour": "muted"}
+          ]
+        },
+        {
+          "type": "textbox",
+          "x": 648,
+          "y": 56,
+          "w": 616,
+          "h": 300,
+          "card": true,
+          "alt": "Sign convention and definitions",
+          "paragraphs": [
+            {"text": "Sign convention and definitions", "size": 12, "bold": true},
+            "The ledger export uses the ledger sign: debit plus, credit minus. The model stores every amount as its contribution to profit: income plus, expense minus. Revenue and cost lines show in display sign, so costs appear as positive amounts. A variance is favourable when it raises profit: more revenue or less cost.",
+            "Closed months: the months up to the last actual month; the budget is compared with actuals only over them.",
+            "Outlook: actuals up to the last closed month, the Q4 forecast after it. Full year adds the open months of the forecast.",
+            "On plan: within 1 % of the budget, or within 0.1 percentage points on a margin line."
+          ]
+        },
+        {
+          "key": "rows",
+          "type": "tableEx",
+          "x": 16,
+          "y": 372,
+          "w": 400,
+          "h": 200,
+          "title": "Rows per scenario",
+          "roles": {"Values": [["DimScenario", "Scenario", "Column"], ["_Measures", "Rows", "Measure"]]},
+          "sort": {"field": ["DimScenario", "Scenario", "Column"], "direction": "Ascending"}
+        },
+        {
+          "type": "textbox",
+          "x": 432,
+          "y": 372,
+          "w": 832,
+          "h": 332,
+          "card": true,
+          "alt": "Data files, security and sources",
+          "paragraphs": [
+            {"text": "Data files, security and sources", "size": 12, "bold": true},
+            "gl_actuals.csv: 3,178 ledger balances, January 2023 to September 2025. budget.xlsx: the sheets Budget 2023, Budget 2024, Budget 2025 and Forecast 2025, 98 rows each. chart_of_accounts.csv: 40 accounts. cost_centres.csv: 6 departments. pnl_layout.csv: the 10 P&L lines. security.csv: 10 rows.",
+            "Row-level security: the Power BI project in the repository defines the role Department head, which limits a department head to the cost centres listed for their address; the copy made for Publish to web leaves the role out.",
+            "Generated by tools/make_data.py with seed 43: uv run python tools/make_data.py",
+            "Repository: github.com/HARISPAARTAN/financial-reporting-dashboard",
+            "Replica: harispaartan.github.io/financial-reporting-dashboard"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "line-tooltip",
+      "displayName": "Line tooltip",
+      "type": "Tooltip",
+      "width": 320,
+      "height": 200,
+      "header": false,
+      "visuals": [
+        {"type": "card", "x": 8, "y": 8, "w": 148, "h": 56, "title": "Actual", "label_size": 14, "roles": {"Values": [["_Measures", "Actual", "Measure"]]}},
+        {"type": "card", "x": 164, "y": 8, "w": 148, "h": 56, "title": "Budget (closed months)", "label_size": 14, "roles": {"Values": [["_Measures", "Budget (closed months)", "Measure"]]}},
+        {"type": "card", "x": 8, "y": 72, "w": 148, "h": 56, "title": "Variance", "label_size": 14, "label_colour_by": ["_Measures", "Favourable colour"], "roles": {"Values": [["_Measures", "Variance", "Measure"]]}},
+        {"type": "card", "x": 164, "y": 72, "w": 148, "h": 56, "title": "Variance %", "label_size": 14, "label_colour_by": ["_Measures", "Favourable colour"], "roles": {"Values": [["_Measures", "Variance %", "Measure"]]}},
+        {"type": "card", "x": 8, "y": 136, "w": 304, "h": 56, "title": "Outlook", "label_size": 14, "roles": {"Values": [["_Measures", "Outlook", "Measure"]]}}
+      ]
+    },
+    {
+      "id": "reconciliation",
+      "displayName": "Reconciliation",
+      "hidden": true,
+      "visuals": [
+        {
+          "type": "textbox",
+          "x": 16,
+          "y": 56,
+          "w": 1248,
+          "h": 48,
+          "alt": "Note on the reconciliation values",
+          "paragraphs": [
+            {"text": "The check values ignore every slicer; row-level security, where a role applies, still limits them. docs/reconciliation.md lists the reference values.", "size": 10, "colour": "muted"}
+          ]
+        },
+        {
+          "key": "checks",
+          "type": "tableEx",
+          "x": 16,
+          "y": 116,
+          "w": 900,
+          "h": 588,
+          "title": "Reconciliation checks R1 to R13",
+          "roles": {
+            "Values": [["ReconCheck", "Id", "Column"], ["ReconCheck", "Label", "Column"], ["_Measures", "Check value", "Measure"]]
+          },
+          "sort": {"field": ["ReconCheck", "Id", "Column"], "direction": "Ascending"}
+        },
+        {
+          "key": "rows",
+          "type": "card",
+          "x": 928,
+          "y": 116,
+          "w": 336,
+          "h": 100,
+          "title": "Fact rows",
+          "roles": {"Values": [["_Measures", "Rows", "Measure"]]}
+        }
+      ]
+    }
+  ]
+}

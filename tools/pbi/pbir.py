@@ -1,7 +1,8 @@
 """PBIR helpers: read a report folder for linting; build visuals from the captured templates.
 
 Project specifics (stable-name namespace, alt-text prefixes) come from tools/pbi/project.json, so the module is
-shared unchanged by every repository that copies tools/pbi/."""
+shared unchanged by every repository that copies tools/pbi/. Visual types without a captured template (QUERY_ONLY:
+waterfall and treemap) are written with their query state only and take every format from the theme and the spec."""
 
 from __future__ import annotations
 
@@ -33,6 +34,11 @@ ROLES = {
     "textbox": set(),
     "gauge": {"Y", "MinValue", "MaxValue", "TargetValue", "Tooltips"},
     "actionButton": set(),
+}
+# visual types without a template in templates/: built from a bare container with the query state only
+QUERY_ONLY = {
+    "waterfallChart": {"Category", "Breakdown", "Y", "Tooltips"},
+    "treemap": {"Group", "Details", "Values", "Tooltips"},
 }
 ALT_PREFIX = {k: v for k, v in PROJECT["alt_prefix"].items() if k != "*"}  # visual type -> alt-text prefix
 ALT_DEFAULT = PROJECT["alt_prefix"]["*"]  # every other type
@@ -297,12 +303,16 @@ class Visual:
         expand: a role (Rows) whose levels are all expanded, as "Expand all down" leaves them;
         a role field is (entity, property, kind) or (entity, property, kind, display name);
         container: container objects (background, border, dropShadow, visualLink ...) that replace the template's."""
-        if visual_type not in ROLES:
+        allowed = ROLES.get(visual_type, QUERY_ONLY.get(visual_type))
+        if allowed is None:
             raise ValueError(f"unknown visual type {visual_type!r}")
-        bad = set(roles) - ROLES[visual_type]
+        bad = set(roles) - allowed
         if bad:
-            raise ValueError(f"{visual_type} has no role(s) {sorted(bad)}; allowed: {sorted(ROLES[visual_type])}")
-        tpl = json.loads((TEMPLATES / f"{visual_type}.json").read_text(encoding="utf-8-sig"))
+            raise ValueError(f"{visual_type} has no role(s) {sorted(bad)}; allowed: {sorted(allowed)}")
+        if visual_type in QUERY_ONLY:
+            tpl = {"visual": {"visualType": visual_type, "query": {"queryState": {}}}}
+        else:
+            tpl = json.loads((TEMPLATES / f"{visual_type}.json").read_text(encoding="utf-8-sig"))
         v = copy.deepcopy(tpl)
         strip_hardcoded_colours(v["visual"])
         drop_theme_owned_container(v["visual"])
@@ -371,6 +381,13 @@ class Visual:
                 "bookmark": _text(bookmark)}
         return Visual.from_template("actionButton", name, x, y, w, h, label, {}, title_hidden=True, extra_objects=objects,
                                     container={"visualLink": [{"properties": link}], **(container or {})})
+
+    @staticmethod
+    def back_button(name: str, x: float, y: float, w: float, h: float, label: str, objects: dict | None = None) -> dict:
+        """An action button that returns to the page the reader drilled through from (a drill-through page's Back)."""
+        link = {"show": _literal("true"), "showDefaultTooltip": _literal("false"), "type": _literal("'Back'")}
+        return Visual.from_template("actionButton", name, x, y, w, h, label, {}, title_hidden=True, extra_objects=objects,
+                                    container={"visualLink": [{"properties": link}]})
 
     @staticmethod
     def textbox(name: str, x: float, y: float, w: float, h: float, paragraphs: list[str | dict], font_size: float = 12,

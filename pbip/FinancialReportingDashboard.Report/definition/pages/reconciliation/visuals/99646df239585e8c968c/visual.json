@@ -1,0 +1,65 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
+  "name": "99646df239585e8c968c",
+  "position": {
+    "height": 48,
+    "tabOrder": 2,
+    "width": 1248,
+    "x": 16,
+    "y": 56,
+    "z": 2
+  },
+  "visual": {
+    "drillFilterOtherVisuals": true,
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "textStyle": {
+                      "color": "#93A1B0",
+                      "fontSize": "10pt"
+                    },
+                    "value": "The check values ignore every slicer; row-level security, where a role applies, still limits them. docs/reconciliation.md lists the reference values."
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "general": [
+        {
+          "properties": {
+            "altText": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Note on the reconciliation values'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualType": "textbox"
+  }
+}

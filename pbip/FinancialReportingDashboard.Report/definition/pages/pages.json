@@ -1,0 +1,14 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/pagesMetadata/1.1.0/schema.json",
+  "activePageName": "pnl-statement",
+  "pageOrder": [
+    "pnl-statement",
+    "variance-analysis",
+    "trend",
+    "opex",
+    "department-detail",
+    "info",
+    "line-tooltip",
+    "reconciliation"
+  ]
+}

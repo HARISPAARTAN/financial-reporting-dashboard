@@ -5,7 +5,7 @@
 Deterministic: fixed names (uuid5 of the project namespace, page id and role), sorted keys, two-space indent, UTF-8
 without BOM, LF. Only page folders carrying the annotation PROJECT["generated"] are replaced; `bookmarks/` and
 `report.json` are owned entirely by this script. Run it only until the first Desktop save; afterwards the files that
-Desktop saved are the source (docs/desktop-session.md).
+Desktop saved are the source (docs/desktop-validation.md).
 
 Nothing in this module is specific to one report. tools/pbi/project.json names the PBIP, the stable-name namespace and
 the theme; pages.json holds the layout:
@@ -17,7 +17,14 @@ the theme; pages.json holds the layout:
 - `tiles`: the KPI row; a tile is a value card above a small card that binds the same measure with a visual filter on
   the calculation item named in `delta` (none: the value card fills the tile);
 - `pages`: per page the slicer names, the tiles and the content visuals in the shape of Visual.from_template, plus the
-  formatting keys handled in `_formatting`.
+  formatting keys handled in `_formatting`; a content visual with a `key` is named after it (else after its index);
+- page keys: `drillthrough` ({"field": [entity, column]}: a drill-through page on that field that keeps every other
+  filter), `hidden` (true: not shown in view mode), `back` (a Back button {"x", "y", "w", "h", "label"}) and
+  `interactions` ([{"source", "targets", "type"}], each end "slicer:<name>", "tiles" or a visual's `key`, and "*" as
+  targets for every other data visual of the page; type `NoFilter` unless given);
+- a tile binds `measure` and, instead of the calculation items `item` and `delta`, may carry `filters` (visual filters
+  of both cards), `delta_measure` (the measure of the card below), `delta_colour` and `colour_by` (measures whose value
+  is the font colour of the delta card and of the value card).
 
 Colour names in pages.json are portfolio-kit tokens (`accent`, `muted`, `ok`, `chart-2` ...), read from the tokens
 file named in project.json, so the report and the web replica share one palette.
@@ -198,6 +205,53 @@ def _data_bars(spec: dict, colours: Colours) -> list[dict]:
     return [{"properties": {"dataBars": bars}, "selector": {"metadata": projection(entity, prop, kind)["queryRef"]}}]
 
 
+WILDCARD = {"dataViewWildcard": {"matchingOption": 1}}  # every data point of the visual, totals excluded
+
+
+def _by_measure(field: list[str]) -> dict:
+    """A colour taken from a measure that returns a hex colour ("Format style: Field value")."""
+    return {"solid": {"color": {"expr": field_ref(*field, "Measure")}}}
+
+
+def _field_value_rules(spec: dict) -> list[dict]:
+    """Font colour (`font_by`) and background (`back_by`) of matrix or table values from a measure:
+    {"measure": [entity, measure], "fields": [[entity, measure], ...]} names the value fields it applies to."""
+    out = []
+    for key, prop in (("font_by", "fontColor"), ("back_by", "backColor")):
+        rule = spec.get(key)
+        for entity, name in rule["fields"] if rule else []:
+            out.append(
+                {
+                    "properties": {prop: _by_measure(rule["measure"])},
+                    "selector": {"data": [WILDCARD], "metadata": projection(entity, name, "Measure")["queryRef"]},
+                }
+            )
+    return out
+
+
+def _matrix(spec: dict) -> dict:
+    """Matrix layout: {"stepped": bool, "icons": bool, "subtotals": "Top" | "Bottom" | None}; column subtotals off."""
+    rows = {"stepped": _lit("true" if spec.get("stepped") else "false")}
+    rows["showExpandCollapseButtons"] = _lit("true" if spec.get("icons") else "false")
+    subtotals = spec.get("subtotals")
+    totals = {"rowSubtotals": _lit("true" if subtotals else "false"), "columnSubtotals": _lit("false")}
+    if subtotals:
+        totals["rowSubtotalsPosition"] = _lit(f"'{subtotals}'")
+    return {"rowHeaders": [{"properties": rows}], "subTotals": [{"properties": totals}]}
+
+
+def _lines(spec: list[dict], colours: Colours, line_chart: bool) -> dict:
+    """Colour per measure of a chart with several measures and, on a line chart, the dash style:
+    [{"field": [entity, measure], "colour": token, "style": "dashed" | "dotted"}]."""
+    fills, styles = [], [{"properties": {"strokeWidth": _lit("2D"), "showMarker": _lit("false")}}]
+    for line in spec:
+        selector = {"metadata": projection(*line["field"], "Measure")["queryRef"]}
+        fills.append({"properties": {"fill": _solid(colours(line["colour"]))}, "selector": selector})
+        if line.get("style"):
+            styles.append({"properties": {"lineStyle": _lit("'" + line["style"] + "'")}, "selector": selector})
+    return {"dataPoint": fills, "lineStyles": styles} if line_chart else {"dataPoint": fills}
+
+
 def _formatting(spec: dict, colours: Colours) -> dict:
     """The visual-level objects a spec asks for, merged in the order below; raw `objects` from the spec come last."""
     objects: dict = {}
@@ -221,7 +275,7 @@ def _formatting(spec: dict, colours: Colours) -> dict:
                 "properties": {
                     "strictSingleSelect": _lit(single),
                     "singleSelect": _lit(single),
-                    "selectAllCheckboxEnabled": _lit("false"),
+                    "selectAllCheckboxEnabled": _lit("true" if spec.get("select_all") else "false"),
                 }
             }
         ]
@@ -251,6 +305,23 @@ def _formatting(spec: dict, colours: Colours) -> dict:
         objects["values"] = _gradient(spec["gradient"], colours)
     if "data_bars" in spec:
         objects["columnFormatting"] = _data_bars(spec["data_bars"], colours)
+    if spec.get("data_labels"):
+        objects["labels"] = [{"properties": {"show": _lit("true")}}]
+    if "label_colour_by" in spec:
+        labels = objects.setdefault("labels", [{"properties": {}}])[0]["properties"]
+        labels["color"] = _by_measure(spec["label_colour_by"])
+    if "fill_by" in spec:
+        fill = {"fill": _by_measure(spec["fill_by"])}
+        objects["dataPoint"] = [{"properties": fill, "selector": {"data": [WILDCARD]}}]
+    if "font_by" in spec or "back_by" in spec:
+        objects.setdefault("values", []).extend(_field_value_rules(spec))
+    if "sentiment" in spec:
+        fills = {f"{part}Fill": _solid(colours(spec["sentiment"][part])) for part in ("increase", "decrease", "total")}
+        objects["sentimentColors"] = [{"properties": fills}]
+    if "matrix" in spec:
+        objects.update(_matrix(spec["matrix"]))
+    if "lines" in spec:
+        objects.update(_lines(spec["lines"], colours, kind in LINE_CHARTS))
     for key, items in spec.get("objects", {}).items():
         objects[key] = items
     return objects
@@ -329,6 +400,7 @@ def _visual(name: str, spec: dict, colours: Colours, sync_group: str | None = No
         sort=spec.get("sort"),
         top_n=spec.get("top_n"),
         field_parameters=parameters,
+        subtitle=spec.get("subtitle"),
         title_hidden=spec.get("title_hidden", False),
         container=_container(spec, colours),
         filters=spec.get("filters"),
@@ -354,6 +426,9 @@ def _slicer_spec(name: str, slicer: dict, row: dict) -> dict:
         spec["selection"] = {"field": slicer["field"], "values": slicer["default"]}
     if slicer.get("only_with"):
         spec["filters"] = [{"field": slicer["only_with"], "kind": "Measure", "op": ">", "value": 0}]
+    for key in ("single", "tiles", "select_all"):
+        if slicer.get(key):
+            spec[key] = slicer[key]
     return spec
 
 
@@ -365,13 +440,14 @@ def tile_specs(page: dict, layout: dict) -> list[tuple[str, dict]]:
         return []
     n = len(tiles)
     width = (layout["w"] - layout["gutter"] * (n - 1)) / n
-    calc_entity, calc_column = layout["calculation"]
+    calc_entity, calc_column = layout.get("calculation") or (None, None)
     out = []
     for i, tile in enumerate(tiles):
         x = layout["x"] + i * (width + layout["gutter"])
         label = tile.get("label", tile["measure"])
         measure = [layout["measures"], tile["measure"], "Measure"]
-        value_h = layout["value_h"] if tile.get("delta") else layout["h"]
+        below = tile.get("delta") or tile.get("delta_measure")
+        value_h = layout["value_h"] if below else layout["h"]
         value = {
             "type": "card",
             "x": x,
@@ -384,8 +460,18 @@ def tile_specs(page: dict, layout: dict) -> list[tuple[str, dict]]:
         }
         if tile.get("item"):
             value["filters"] = [{"field": [calc_entity, calc_column], "in": [tile["item"]]}]
+        if tile.get("filters"):
+            value["filters"] = tile["filters"]
+        if tile.get("colour_by"):
+            value["label_colour_by"] = [layout["measures"], tile["colour_by"]]
         out.append((f"tile{i}", value))
-        if tile.get("delta"):
+        if below:
+            if tile.get("delta_measure"):
+                bound = [layout["measures"], tile["delta_measure"], "Measure", layout["delta_label"]]
+                filters = tile.get("filters", [])
+            else:
+                bound = [*measure, layout["delta_label"]]
+                filters = [{"field": [calc_entity, calc_column], "in": [tile["delta"]]}]
             delta = {
                 "type": "card",
                 "x": x,
@@ -396,11 +482,18 @@ def tile_specs(page: dict, layout: dict) -> list[tuple[str, dict]]:
                 "title_hidden": True,
                 "label_size": 11,
                 "category_label": True,
-                "roles": {"Values": [[*measure, layout["delta_label"]]]},
-                "filters": [{"field": [calc_entity, calc_column], "in": [tile["delta"]]}],
+                "roles": {"Values": [bound]},
+                "filters": filters,
             }
+            if tile.get("delta_colour"):
+                delta["label_colour_by"] = [layout["measures"], tile["delta_colour"]]
             out.append((f"tile{i}-delta", delta))
     return out
+
+
+def content_name(page_id: str, index: int, visual: dict) -> str:
+    """The stable name of a content visual: after its `key` if it has one, else after its position on the page."""
+    return stable_name(page_id, visual["key"] if "key" in visual else str(index))
 
 
 def page_visuals(page: dict, spec: dict, colours: Colours) -> list[dict]:
@@ -448,30 +541,43 @@ def page_visuals(page: dict, spec: dict, colours: Colours) -> list[dict]:
             Visual.bookmark_button(
                 stable_name(pid, "reset"),
                 reset["x"],
-                row["y"],
+                reset.get("y", row["y"]),
                 reset["w"],
-                row["h"],
+                reset.get("h", row["h"]),
                 reset["label"],
                 bookmark_name(pid),
                 objects=_button_objects(reset, colours),
             )
         )
+    back = page.get("back")
+    if back:
+        ordered.append(
+            Visual.back_button(
+                stable_name(pid, "back"),
+                back["x"],
+                back["y"],
+                back["w"],
+                back["h"],
+                back["label"],
+                objects=_button_objects(back, colours),
+            )
+        )
     for key, tile in tile_specs(page, spec["tiles"]):
         ordered.append(_visual(stable_name(pid, key), tile, colours))
     for index, visual in enumerate(page.get("visuals", [])):
-        ordered.append(_visual(stable_name(pid, str(index)), visual, colours))
+        ordered.append(_visual(content_name(pid, index, visual), visual, colours))
     for position, visual in enumerate(ordered):
         visual["position"]["z"] = visual["position"]["tabOrder"] = position
     return ordered
 
 
-def _button_objects(reset: dict, colours: Colours) -> dict:
-    """Label and outline of the Reset button, with a hover state in the accent colour."""
+def _button_objects(button: dict, colours: Colours) -> dict:
+    """Label and outline of a Reset or Back button, with a hover state in the accent colour."""
     text = [
         {"properties": {"show": _lit("true")}},
         {
             "properties": {
-                "text": _text(reset["label"]),
+                "text": _text(button["label"]),
                 "fontColor": _solid(colours("text")),
                 "fontSize": _lit("10D"),
             },
@@ -494,7 +600,34 @@ def bookmark_name(page_id: str) -> str:
     return stable_name("bookmark", page_id)
 
 
-def _page_json(page: dict, spec: dict) -> dict:
+def _interactions(page: dict, spec: dict, visuals: list[dict]) -> list[dict]:
+    """visualInteractions of a page from its `interactions` rules (see the module docstring)."""
+    pid = page["id"]
+    tiles = [stable_name(pid, key) for key, _ in tile_specs(page, spec["tiles"])]
+    data = [v["name"] for v in visuals if "query" in v.get("visual", {})]
+
+    def resolve(ref: str) -> list[str]:
+        if ref == "tiles":
+            return tiles
+        if ref.startswith("slicer:"):
+            return [stable_name(pid, "slicer", ref.split(":", 1)[1])]
+        return [stable_name(pid, ref)]
+
+    out = []
+    for rule in page["interactions"]:
+        (source,) = resolve(rule["source"])
+        if rule["targets"] == "*":
+            targets = [name for name in data if name != source]
+        else:
+            targets = [name for ref in rule["targets"] for name in resolve(ref)]
+        unknown = sorted({source, *targets} - {v["name"] for v in visuals})
+        if unknown:
+            raise ValueError(f"interactions of {pid!r} name unknown visuals {unknown}")
+        out += [{"source": source, "target": target, "type": rule.get("type", "NoFilter")} for target in targets]
+    return out
+
+
+def _page_json(page: dict, spec: dict, visuals: list[dict] | None = None) -> dict:
     data = {
         "$schema": SCHEMAS["page.json"],
         "name": page["id"],
@@ -508,6 +641,23 @@ def _page_json(page: dict, spec: dict) -> dict:
         data["type"] = "Tooltip"
         data["visibility"] = "HiddenInViewMode"
         data["pageBinding"] = {"name": stable_name(page["id"], "binding"), "type": "Tooltip"}
+    if page.get("drillthrough"):
+        field = _column(*page["drillthrough"]["field"])
+        bound = stable_name(page["id"], "drillthrough")
+        data["type"] = "Drillthrough"
+        data["pageBinding"] = {
+            "name": stable_name(page["id"], "binding"),
+            "type": "Drillthrough",
+            "referenceScope": "Default",
+            "parameters": [{"name": stable_name(page["id"], "parameter"), "boundFilter": bound, "fieldExpr": field}],
+        }
+        data["filterConfig"] = {
+            "filters": [{"name": bound, "field": field, "type": "Categorical", "howCreated": "Drillthrough"}]
+        }
+    if page.get("hidden"):
+        data["visibility"] = "HiddenInViewMode"
+    if page.get("interactions"):
+        data["visualInteractions"] = _interactions(page, spec, visuals or [])
     return data
 
 
@@ -526,7 +676,7 @@ def _bookmark_json(page: dict, spec: dict, visuals: list[dict]) -> dict:
             objects = {"remove": [{"object": "general", "property": "filter"}]}
         states[vname] = {"singleVisual": {"visualType": "slicer", "objects": objects}}
     for index, visual in enumerate(page.get("visuals", [])):
-        vname = stable_name(pid, str(index))
+        vname = content_name(pid, index, visual)
         if visual.get("reset") == "remove":
             states[vname] = {
                 "singleVisual": {
@@ -539,6 +689,8 @@ def _bookmark_json(page: dict, spec: dict, visuals: list[dict]) -> dict:
             states[vname] = {
                 "singleVisual": {"visualType": visual["type"], "activeProjections": {"Category": [field_ref(*top)]}}
             }
+        elif visual.get("reset") == "collapse":
+            states[vname] = {"singleVisual": {"visualType": visual["type"], "expansionStates": []}}
     known = {v["name"] for v in visuals}
     missing = sorted(set(states) - known)
     if missing:
@@ -618,8 +770,8 @@ def main() -> int:
     count = 0
     for page in pages:
         pdir = DEFINITION / "pages" / page["id"]
-        write_json(pdir / "page.json", _page_json(page, spec))
         visuals = page_visuals(page, spec, colours)
+        write_json(pdir / "page.json", _page_json(page, spec, visuals))
         for v in visuals:
             write_json(pdir / "visuals" / v["name"] / "visual.json", v)
         count += len(visuals)
