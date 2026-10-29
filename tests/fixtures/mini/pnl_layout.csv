@@ -1,0 +1,11 @@
+line_key,line,line_type,group,bound,sign,sort_order
+REV,Revenue,Group,Revenue,,1,10
+COS,Cost of services,Group,Cost of services,,-1,20
+GP,Gross profit,Subtotal,,30,1,30
+GPM,Gross margin %,Ratio,,30,1,35
+OPEX,Operating expenses,Group,Operating expenses,,-1,40
+EBITDA,EBITDA,Subtotal,,50,1,50
+EBITDAM,EBITDA margin %,Ratio,,50,1,55
+DA,Depreciation and amortisation,Group,Depreciation and amortisation,,-1,60
+EBIT,EBIT,Subtotal,,70,1,70
+EBITM,EBIT margin %,Ratio,,70,1,75

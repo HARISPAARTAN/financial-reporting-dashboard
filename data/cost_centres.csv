@@ -1,0 +1,7 @@
+cost_centre,name,type,head_name,head_email,sort_order
+CC10,Cleaning Services,Operating,Cornelius Holzmann,cornelius.holzmann@kaldora.example,1
+CC20,Technical Maintenance,Operating,Marco Lutz,marco.lutz@kaldora.example,2
+CC30,Security Services,Operating,Kerstin Schaller,kerstin.schaller@kaldora.example,3
+CC40,Catering,Operating,Johannes Lintner,johannes.lintner@kaldora.example,4
+CC80,Administration,Support,Ruth Rauter,ruth.rauter@kaldora.example,5
+CC90,Sales & Marketing,Support,Aurelio Neugebauer,aurelio.neugebauer@kaldora.example,6

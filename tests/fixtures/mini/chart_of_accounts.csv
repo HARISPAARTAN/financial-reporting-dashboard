@@ -1,0 +1,4 @@
+account,name,group,subgroup,sign,sort_order
+4000,Cleaning contracts,Revenue,Contract revenue,1,1
+5000,Direct wages,Cost of services,Direct personnel,-1,11
+6000,"Salaries, management and administration",Operating expenses,Overhead personnel,-1,22

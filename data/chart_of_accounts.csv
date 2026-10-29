@@ -1,0 +1,41 @@
+account,name,group,subgroup,sign,sort_order
+4000,Cleaning contracts,Revenue,Contract revenue,1,1
+4010,Maintenance contracts,Revenue,Contract revenue,1,2
+4020,Security contracts,Revenue,Contract revenue,1,3
+4030,Catering contracts,Revenue,Contract revenue,1,4
+4100,Special cleaning and ad-hoc jobs,Revenue,Project and ad-hoc revenue,1,5
+4110,Repairs and call-outs,Revenue,Project and ad-hoc revenue,1,6
+4120,Event security,Revenue,Project and ad-hoc revenue,1,7
+4130,Event catering,Revenue,Project and ad-hoc revenue,1,8
+4200,Material recharges,Revenue,Other revenue,1,9
+4900,Revenue reductions,Revenue,Other revenue,1,10
+5000,Direct wages,Cost of services,Direct personnel,-1,11
+5010,Overtime and shift premiums,Cost of services,Direct personnel,-1,12
+5020,"Employer social security, direct staff",Cost of services,Direct personnel,-1,13
+5030,Temporary staff,Cost of services,Direct personnel,-1,14
+5100,Cleaning agents and consumables,Cost of services,Materials and consumables,-1,15
+5110,Spare parts and technical materials,Cost of services,Materials and consumables,-1,16
+5120,Food and beverages,Cost of services,Materials and consumables,-1,17
+5130,Workwear and protective equipment,Cost of services,Materials and consumables,-1,18
+5200,Subcontracted services,Cost of services,Subcontractors,-1,19
+5300,Vehicle running costs,Cost of services,Vehicles and equipment,-1,20
+5310,Equipment rental and maintenance,Cost of services,Vehicles and equipment,-1,21
+6000,"Salaries, management and administration",Operating expenses,Overhead personnel,-1,22
+6010,"Employer social security, salaried staff",Operating expenses,Overhead personnel,-1,23
+6020,Training and recruitment,Operating expenses,Overhead personnel,-1,24
+6100,Rent and service charges,Operating expenses,Premises,-1,25
+6110,Energy and utilities,Operating expenses,Premises,-1,26
+6200,"IT services, licences and telecommunication",Operating expenses,IT and communication,-1,27
+6300,Advertising and campaigns,Operating expenses,Sales and marketing,-1,28
+6310,Trade fairs and events,Operating expenses,Sales and marketing,-1,29
+6320,Sales commissions,Operating expenses,Sales and marketing,-1,30
+6400,Insurance,Operating expenses,Administration and other,-1,31
+6410,"Legal, audit and consulting",Operating expenses,Administration and other,-1,32
+6420,Office supplies and postage,Operating expenses,Administration and other,-1,33
+6430,Travel expenses,Operating expenses,Administration and other,-1,34
+6450,Bad debt expense,Operating expenses,Administration and other,-1,35
+6490,Other operating expenses,Operating expenses,Administration and other,-1,36
+7000,Depreciation of vehicles,Depreciation and amortisation,Depreciation and amortisation,-1,37
+7010,Depreciation of machinery and equipment,Depreciation and amortisation,Depreciation and amortisation,-1,38
+7020,Depreciation of IT and office equipment,Depreciation and amortisation,Depreciation and amortisation,-1,39
+7030,Amortisation of software,Depreciation and amortisation,Depreciation and amortisation,-1,40
