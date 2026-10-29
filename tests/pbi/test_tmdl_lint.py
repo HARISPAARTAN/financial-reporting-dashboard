@@ -386,6 +386,13 @@ def test_dax_references_resolve(model):
             assert item in measures, (where, item)
 
 
+def test_no_table_level_isfiltered(model):
+    """ISFILTERED on a whole table is TRUE under the role's filter on a hidden key column and blanks the measure."""
+    table_level = re.compile(r"ISFILTERED\s*\(\s*'?[^'\[\]()]+'?\s*\)", re.IGNORECASE)
+    for where, dax in _expressions(model):
+        assert not table_level.search(dax), where
+
+
 def test_mutation_unknown_column_is_caught(model):
     bad = [("measure X", "SUM(FactGL[Amonut])")]
     cols = {(t, c) for t, tab in model.tables.items() for c in tab.columns}
