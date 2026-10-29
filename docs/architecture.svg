@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 620" width="960" height="620" role="img" aria-labelledby="title desc">
+  <title id="title">Financial Reporting Dashboard architecture</title>
+  <desc id="desc">The seeded generator writes the ledger export, the budget workbook and four CSV files. Branch a: Power Query in the PBIP stages each file and unpivots the budget into the TMDL model, which feeds the PBIR report; the owner opens it in the Desktop session on the local machine. Branch b: the pandas reference reads the same files and feeds the measure test, the reconciliation table and the replica data builder, which writes kaldora.json for the HTML replica. The branches meet in the reconciliation table. CI runs the Python and node tests and the checks.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#93A1B0"/>
+    </marker>
+    <style>
+      text { font-family: Inter, "Segoe UI", Helvetica, Arial, sans-serif; fill: #E6EDF3; font-size: 14px; }
+      .title { font-size: 18px; font-weight: 600; }
+      .head { font-size: 15px; font-weight: 600; fill: #F2A93B; }
+      .muted { fill: #93A1B0; font-size: 13px; }
+      .mono { font-family: "JetBrains Mono", Consolas, monospace; font-size: 12.5px; }
+      .box { fill: #121820; stroke: #1F2A36; stroke-width: 1.5; }
+      .local { fill: #121820; stroke: #93A1B0; stroke-width: 1.5; stroke-dasharray: 6 4; }
+      .meet { fill: #182130; stroke: #F2A93B; stroke-width: 1.5; }
+      .frame { fill: none; stroke: #1F2A36; stroke-width: 1.5; stroke-dasharray: 4 4; }
+      .flow { fill: none; stroke: #93A1B0; stroke-width: 1.5; marker-end: url(#arrow); }
+    </style>
+  </defs>
+  <rect x="0" y="0" width="960" height="620" rx="12" fill="#0B0F14"/>
+  <text class="title" x="24" y="40">Two branches from the same files</text>
+
+  <rect class="box" x="24" y="72" width="240" height="150" rx="8"/>
+  <text class="head" x="40" y="100">Generator</text>
+  <text class="mono" x="40" y="126">tools/make_data.py</text>
+  <text class="muted" x="40" y="150">seed 43, --check</text>
+  <text class="mono" x="40" y="176">data/gl_actuals.csv</text>
+  <text class="mono" x="40" y="194">data/budget.xlsx</text>
+  <text class="mono" x="40" y="212">data/*.csv (four more)</text>
+
+  <text class="muted" x="312" y="92">a  Power BI</text>
+  <rect class="box" x="312" y="104" width="196" height="100" rx="8"/>
+  <text class="head" x="328" y="132">Power Query</text>
+  <text class="muted" x="328" y="156">one staging query per file,</text>
+  <text class="muted" x="328" y="176">budget unpivoted</text>
+
+  <rect class="box" x="532" y="104" width="196" height="100" rx="8"/>
+  <text class="head" x="548" y="132">TMDL model</text>
+  <text class="muted" x="548" y="156">P&amp;L layout, 36 measures,</text>
+  <text class="muted" x="548" y="176">role Department head</text>
+
+  <rect class="box" x="752" y="104" width="184" height="100" rx="8"/>
+  <text class="head" x="768" y="132">PBIR report</text>
+  <text class="muted" x="768" y="156">six pages, tooltip,</text>
+  <text class="muted" x="768" y="176">theme Kaldora Dark</text>
+
+  <rect class="local" x="752" y="232" width="184" height="80" rx="8"/>
+  <text class="head" x="768" y="260">Desktop session</text>
+  <text class="muted" x="768" y="284">owner, local</text>
+
+  <rect class="frame" x="296" y="324" width="648" height="276" rx="10"/>
+  <text class="muted" x="312" y="588">CI: pytest, node --test, the checks</text>
+
+  <text class="muted" x="312" y="352">b  Python</text>
+  <rect class="box" x="312" y="364" width="196" height="100" rx="8"/>
+  <text class="head" x="328" y="392">Reference</text>
+  <text class="mono" x="328" y="416">tools/reference.py</text>
+  <text class="muted" x="328" y="440">pandas, integer cents</text>
+
+  <rect class="meet" x="532" y="340" width="404" height="112" rx="8"/>
+  <text class="head" x="548" y="368">Reconciliation R1 to R13</text>
+  <text class="muted" x="548" y="392">Python column: tests/test_measures.py</text>
+  <text class="muted" x="548" y="414">Desktop column: the hidden Reconciliation page</text>
+  <text class="mono" x="548" y="438">docs/reconciliation.md</text>
+
+  <rect class="box" x="532" y="468" width="196" height="104" rx="8"/>
+  <text class="head" x="548" y="496">Replica data</text>
+  <text class="mono" x="548" y="520">build_replica_data.py</text>
+  <text class="mono" x="548" y="540">kaldora.json</text>
+  <text class="mono" x="548" y="560">test_parity.py</text>
+
+  <rect class="box" x="752" y="468" width="184" height="104" rx="8"/>
+  <text class="head" x="768" y="496">HTML replica</text>
+  <text class="muted" x="768" y="520">web/, pnl.js,</text>
+  <text class="muted" x="768" y="540">ECharts, GitHub Pages</text>
+
+  <path class="flow" d="M264 154 H306"/>
+  <path class="flow" d="M508 154 H526"/>
+  <path class="flow" d="M728 154 H746"/>
+  <path class="flow" d="M844 204 V226"/>
+  <path class="flow" d="M844 312 V334"/>
+  <path class="flow" d="M144 222 V414 H306"/>
+  <path class="flow" d="M508 400 H526"/>
+  <path class="flow" d="M410 464 V520 H526"/>
+  <path class="flow" d="M728 520 H746"/>
+</svg>
