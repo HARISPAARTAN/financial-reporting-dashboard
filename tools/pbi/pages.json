@@ -170,7 +170,7 @@
           "lines": [
             {"field": ["_Measures", "Actual"], "colour": "chart-1"},
             {"field": ["_Measures", "Budget"], "colour": "muted", "style": "dashed"},
-            {"field": ["_Measures", "Forecast"], "colour": "accent", "style": "dotted"}
+            {"field": ["_Measures", "Forecast"], "colour": "chart-4", "style": "dotted"}
           ],
           "tooltip_page": "line-tooltip"
         },
@@ -190,7 +190,7 @@
           "lines": [
             {"field": ["_Measures", "Actual YTD"], "colour": "chart-1"},
             {"field": ["_Measures", "Budget YTD"], "colour": "muted", "style": "dashed"},
-            {"field": ["_Measures", "Outlook YTD"], "colour": "accent", "style": "dotted"}
+            {"field": ["_Measures", "Outlook YTD"], "colour": "chart-4", "style": "dotted"}
           ]
         },
         {
@@ -207,7 +207,7 @@
           },
           "sort": {"field": ["DimDate", "Year", "Column"], "direction": "Ascending"},
           "lines": [
-            {"field": ["_Measures", "Full-year outlook"], "colour": "accent"},
+            {"field": ["_Measures", "Full-year outlook"], "colour": "chart-4"},
             {"field": ["_Measures", "Budget full year"], "colour": "muted"}
           ]
         }

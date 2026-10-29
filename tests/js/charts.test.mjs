@@ -9,7 +9,7 @@ import { GROUP_LINES, contextOf, createModel, departmentsView, trendView, waterf
 const data = JSON.parse(readFileSync(new URL('../../web/assets/data/kaldora.json', import.meta.url), 'utf8'));
 const model = createModel(data);
 const S1 = data.headline.S1.state;
-const C = { ok: '#0f0', warn: '#ff0', muted: '#888', border: '#333', accent: '#fa0', text: '#fff', chart: ['#c80', '#08c'] };
+const C = { ok: '#0f0', warn: '#ff0', muted: '#888', border: '#333', accent: '#fa0', text: '#fff', chart: ['#c80', '#08c', '#0c8', '#80c'] };
 const groups = GROUP_LINES.map((key) => ({ key, name: model.lines.get(key).line }));
 
 test('stackParts covers both sides and a column that crosses zero', () => {
@@ -68,7 +68,7 @@ test('the trend draws Actual solid, Budget dashed and Forecast dotted over 36 mo
   assert.deepEqual(option.series.map((s) => [s.name, s.lineStyle.type, s.lineStyle.color]), [
     ['Actual', 'solid', C.chart[0]],
     ['Budget', 'dashed', C.muted],
-    ['Forecast', 'dotted', C.accent],
+    ['Forecast', 'dotted', C.chart[3]],
   ]);
   assert.equal(option.xAxis.data.length, 36);
   assert.equal(option.xAxis.data[0], 'Jan 2023');

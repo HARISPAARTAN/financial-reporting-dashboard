@@ -131,7 +131,7 @@ export function waterfall(steps, c, { motion = true, narrow = false } = {}) {
   };
 }
 
-/** Trend of one line: Actual solid (series colour 1), Budget dashed (muted), Forecast dotted (accent). */
+/** Trend of one line: Actual solid (series colour 1), Budget dashed (muted), Forecast dotted (series colour 4). */
 export function trend(view, { ratio = false } = {}, c, motion = true) {
   const scale = ratio ? (v) => v : thousand;
   const show = ratio ? pct : kEur;
@@ -163,7 +163,7 @@ export function trend(view, { ratio = false } = {}, c, motion = true) {
     series: [
       line('Actual', view.actual, c.chart[0], 'solid'),
       line('Budget', view.budget, c.muted, 'dashed'),
-      line('Forecast', view.forecast, c.accent, 'dotted'),
+      line('Forecast', view.forecast, c.chart[3], 'dotted'),
     ],
   };
 }
