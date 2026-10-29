@@ -554,6 +554,22 @@ def test_mutation_formatting_and_interactions_are_caught(report):
     assert interaction_problems(broken)
 
 
+def test_generated_report_counts_positions_and_literals(report):
+    """Pins the plan's fixed numbers that no other check holds: 87 visuals, the Back button at x 1052, filter
+    aliases named f<n> and unique within a visual, and no exponent literal anywhere in the generated report."""
+    assert len(list(REPORT.rglob("visual.json"))) == 87
+    detail = page(report, "Department detail")
+    back = [v for v in detail.visuals if v.visual_type == "actionButton" and v.title == "Back"]
+    assert box(back[0])[0] == 1052
+    exponent = re.compile(r"\d[eE][+-]\d")
+    for path in REPORT.rglob("*.json"):
+        text = path.read_text(encoding="utf-8")
+        assert not exponent.search(text), path
+        if path.name == "visual.json":
+            aliases = re.findall(r'"Name": "(f\d+)"', text)
+            assert len(aliases) == len(set(aliases)), path
+
+
 def test_mutation_tile_without_its_line_filter_is_caught(report):
     pg = copy.deepcopy(page(report, "P&L statement"))
     tile = next(v for v in pg.visuals if v.name == stable_name("pnl-statement", "tile0"))
