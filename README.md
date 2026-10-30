@@ -33,7 +33,7 @@ Eight report pages with the theme Kaldora Dark: six content pages and the hidden
 - **P&L statement**: revenue, gross margin %, EBITDA, EBITDA margin % and EBIT against budget; a matrix of the ten P&L lines with subgroups and accounts below them, one column per month, YTD and Full year; the Scenario slicer switches the matrix between Actual, Budget and Forecast (the outlook).
 - **Variance analysis**: budget EBIT, actual EBIT, the EBIT variance and the full-year outlook against budget; EBITDA variance by department; a waterfall of the EBIT variance by account group; the variance matrix with a status per line.
 - **Trend**: actual, budget and forecast of one P&L line by month from 2023 to 2025, the cumulative lines within each year and the full year.
-- **Opex**: operating expenses against budget, as a share of revenue and the personnel cost share; a treemap by subgroup and account, opex by department and the ten accounts with the largest variances.
+- **Opex**: operating expenses against budget, as a share of revenue and the personnel cost share; a treemap by subgroup and account, opex by department and the ten accounts with the largest overspends against budget.
 - **Department detail**: one department's P&L and EBITDA by month, reached by a drill-through from a department bar.
 - **Info**: what the report shows, the sign convention, the definitions, the data files and the sources.
 

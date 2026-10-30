@@ -52,7 +52,7 @@ Some formatting objects are written from the published schemas but only Desktop 
 | Waterfall (Variance analysis) | four account groups and the total column (Desktop captions it Total); increases ok, decreases warning, the total in the muted colour | Format, Sentiment colors: Increase, Decrease and Total |
 | Trend lines | Actual solid, Budget dashed and muted, Forecast dotted in the fourth series colour | Format, Lines, series Budget Line style Dashed, series Forecast Line style Dotted |
 | Treemap (Opex) | the five opex subgroups with their accounts | Build, Category `Subgroup`, Details `Account label` |
-| Largest opex variances (Opex) | ten rows, one per account, sorted by `Variance` | Filters pane, Account label, Top N 10 by Variance |
+| Largest opex overspends (Opex) | ten rows, one per account, ranked by the signed `Variance`, overspends first | Filters pane, Account label, Top N 10 by Variance |
 | Slicer row | Year lists 2023 to 2025 with 2025 selected; Months is a slider from 1 to 12; Scenario is a tile slicer with Actual selected; Trend has Department and P&L line (EBITDA) only | Format, Slicer settings, Style and Single select |
 | Sync groups | a department chosen on P&L statement is chosen on Variance analysis, Trend and Opex; Year and Months follow on the pages that have them | View, Sync slicers, tick the pages for the group |
 | Scenario slicer | Budget changes the matrix only, not the tiles | Format, Edit interactions, the tiles None |

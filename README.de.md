@@ -33,7 +33,7 @@ Acht Berichtsseiten im Design Kaldora Dark: sechs Inhaltsseiten und die verborge
 - **P&L statement**: Umsatz, Bruttomarge in %, EBITDA, EBITDA-Marge in % und EBIT gegen Budget; eine Matrix der zehn GuV-Zeilen mit Untergruppen und Konten darunter, eine Spalte je Monat, YTD und Full year; der Slicer Scenario schaltet die Matrix zwischen Actual, Budget und Forecast (dem Ausblick) um.
 - **Variance analysis**: Budget-EBIT, Ist-EBIT, die EBIT-Abweichung und der Jahresausblick gegen Budget; die EBITDA-Abweichung je Abteilung; ein Wasserfall der EBIT-Abweichung nach Kontengruppe; die Abweichungsmatrix mit einem Status je Zeile.
 - **Trend**: Ist, Budget und Forecast einer GuV-Zeile je Monat von 2023 bis 2025, die kumulierten Linien innerhalb jedes Jahres und das ganze Jahr.
-- **Opex**: Betriebsaufwände gegen Budget, ihr Anteil am Umsatz und der Anteil der Personalkosten; eine Treemap nach Untergruppe und Konto, Opex je Abteilung und die zehn Konten mit den größten Abweichungen.
+- **Opex**: Betriebsaufwände gegen Budget, ihr Anteil am Umsatz und der Anteil der Personalkosten; eine Treemap nach Untergruppe und Konto, Opex je Abteilung und die zehn Konten mit den größten Mehrausgaben gegenüber dem Budget.
 - **Department detail**: die GuV einer Abteilung und ihr EBITDA je Monat, erreichbar per Drillthrough von einem Abteilungsbalken.
 - **Info**: was der Bericht zeigt, die Vorzeichenregel, die Definitionen, die Datendateien und die Quellen.
 

@@ -265,7 +265,7 @@
           "y": 212,
           "w": 736,
           "h": 492,
-          "title": "Largest opex variances",
+          "title": "Largest opex overspends",
           "roles": {
             "Values": [
               ["DimAccount", "Account label", "Column", "Account"],

@@ -451,6 +451,17 @@ def test_visuals_bind_what_section_6_says(report):
         "Details": [("DimAccount", "Account label")],
         "Values": [("_Measures", "Actual")],
     }
+    assert visual(report, "Opex", "table").title == "Largest opex overspends"
+    assert roles("Opex", "table") == {
+        "Values": [
+            ("DimAccount", "Account label"),
+            ("_Measures", "Actual"),
+            ("_Measures", "Budget (closed months)"),
+            ("_Measures", "Variance"),
+            ("_Measures", "Variance %"),
+            ("_Measures", "Favourable label"),
+        ]
+    }
     table = visual(report, "Opex", "table").raw
     topn = [f for f in table["filterConfig"]["filters"] if f["type"] == "TopN"]
     assert len(topn) == 1 and '"Top": 10' in json.dumps(topn[0]) and '"Property": "Variance"' in json.dumps(topn[0])
