@@ -4,7 +4,7 @@
 [![Pages](https://github.com/HARISPAARTAN/financial-reporting-dashboard/actions/workflows/pages.yml/badge.svg)](https://github.com/HARISPAARTAN/financial-reporting-dashboard/actions/workflows/pages.yml)
 [![Release](https://img.shields.io/github/v/release/HARISPAARTAN/financial-reporting-dashboard?sort=semver)](https://github.com/HARISPAARTAN/financial-reporting-dashboard/releases)
 
-Power BI management P&L for a fictional facility-services company: a P&L layout with subtotals and margins in TMDL, one sign convention for every variance, budget against closed months only, a full-year outlook from actuals and the Q4 forecast, row-level security per department, the thirteen headline checks reconciled against an independent Python computation, and a live HTML replica.
+Power BI management P&L for a fictional facility-services company: a P&L layout with subtotals and margins in TMDL, one sign convention for every variance, budget against closed months only, a full-year outlook from actuals and the Q4 forecast, row-level security per department, the thirteen headline checks computed independently in pandas and listed for the Desktop reconciliation, and a live HTML replica.
 
 Deutsch: [README.de.md](README.de.md)
 
@@ -24,11 +24,11 @@ Rebuilt from memory as a demo. The original client's name and data are not used.
 
 [harispaartan.github.io/financial-reporting-dashboard](https://harispaartan.github.io/financial-reporting-dashboard/)
 
-The replica is a static page with three of the report pages as tabs (P&L statement, Variance, Trend), the same rules as the report (sign convention, closed-month budget, outlook, favourable status) and the filters Year, Months, Department and Scenario, plus a click on a department bar that filters the waterfall and the variance table. It is drawn with ECharts from the ledger facts that the Python reference writes, runs in the browser without a server and sends no data anywhere; your filters stay in this browser only. It leaves out the Opex page, the Department detail drill-through, the Info page (the About section replaces it), the tooltip page, the reconciliation page, row-level security, and on the Trend tab the cumulative and full-year charts and the Year and Months filters (the chart always shows 2023 to 2025).
+The replica is a static page with three of the report pages as tabs (P&L statement, Variance, Trend), the same rules as the report (sign convention, closed-month budget, outlook, favourable status) and the filters Year, Months, Department and Scenario, plus a click on a department bar that filters the waterfall and the variance table. It is drawn with ECharts from the ledger facts that the Python reference writes, runs in the browser without a server and sends no data anywhere; your filters stay in this browser only. It leaves out the Opex page, the Department detail drill-through, the Info page (the About section replaces it), the tooltip page, the reconciliation page, row-level security, and on the Trend tab the cumulative and full-year charts (the chart always shows 2023 to 2025).
 
 ## What it does
 
-Eight report pages with the theme Kaldora Dark: six content pages and the hidden page Reconciliation on a 1280 × 720 canvas, and the tooltip page Line tooltip on 320 × 200. The content pages share a header with the data date and a Reset button, a slicer row (Year, Months, Department) synced across the pages, and a row of KPI tiles against budget.
+Eight report pages with the theme Kaldora Dark: six content pages and the hidden page Reconciliation on a 1280 × 720 canvas, and the tooltip page Line tooltip on 320 × 200. P&L statement carries the slicers Year, Months, Department and Scenario, Variance analysis and Opex carry Year, Months and Department, Department detail carries Year and Months, Trend carries Department and P&L line, and Info carries none; each slicer is synced across the pages that carry it, and each page with slicers has a Reset button. A row of KPI tiles sits on P&L statement, Variance analysis, Opex and Department detail, and Trend and Info have none.
 
 - **P&L statement**: revenue, gross margin %, EBITDA, EBITDA margin % and EBIT against budget; a matrix of the ten P&L lines with subgroups and accounts below them, one column per month, YTD and Full year; the Scenario slicer switches the matrix between Actual, Budget and Forecast (the outlook).
 - **Variance analysis**: budget EBIT, actual EBIT, the EBIT variance and the full-year outlook against budget; EBITDA variance by department; a waterfall from budget EBIT to actual EBIT by account group; the variance matrix with a status per line.
@@ -94,10 +94,12 @@ This rebuild adds:
 - a written brief with users, scope and acceptance criteria, and a documented data model with the P&L layout as its own table;
 - the sign convention as a decision record, so income and cost lines colour their variances by one rule;
 - the model and the report as reviewable text (TMDL and PBIR) with offline lint tests and schema checks;
-- thirteen headline checks reconciled against an independent pandas computation, including the revenue a department head sees under the role;
-- row-level security that is checked, and a script for the role-free copy that Publish to web needs;
+- the thirteen headline checks computed independently in pandas and listed for the Desktop reconciliation, including the revenue a department head sees under the role;
+- row-level security per department (a role with a security table), and a script for the role-free copy that Publish to web needs;
 - handover notes for the monthly close, new accounts, cost centres and department heads;
 - CI with `uv sync --locked` and pinned actions, and a live replica with a tested P&L engine.
+
+The client's real ledger and budget, the production use and the acceptance by the client are not carried over, and the Desktop validation is still to run (see Status).
 
 ## Licence and data note
 

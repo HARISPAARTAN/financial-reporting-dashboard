@@ -65,6 +65,16 @@ SHOTS = [
     "11-replica-1440.png",
     "12-replica-390.png",
 ]
+SLICERS = {
+    "P&L statement": ["Year", "Months", "Department", "Scenario"],
+    "Variance analysis": ["Year", "Months", "Department"],
+    "Trend": ["Department", "P&L line"],
+    "Opex": ["Year", "Months", "Department"],
+    "Department detail": ["Year", "Months"],
+    "Info": [],
+    "Reconciliation": [],
+}
+TILE_PAGES = ["P&L statement", "Variance analysis", "Opex", "Department detail"]
 
 
 @pytest.fixture(scope="module")
@@ -120,11 +130,54 @@ def test_readme_facts_match_the_project(model):
     assert "Eight report pages with the theme Kaldora Dark: six content pages and the hidden page" in text
     size = f"{tooltip[0]['width']} × {tooltip[0]['height']}"
     assert f"on a 1280 × 720 canvas, and the tooltip page Line tooltip on {size}" in text
-    assert len(reference.CHECKS) == 13 and "the thirteen headline checks reconciled" in text
+    assert len(reference.CHECKS) == 13
+    assert re.search(r"the thirteen headline checks (reconciled|computed independently)", text)
+    assert "every number" not in text and "that is checked" not in text
     assert f"{len(model.tables['_Measures'].measures)} measures in `_Measures`" in text
+    live = text.split("## Live demo", 1)[1].split("## ", 1)[0]
     for left_out in ("the Opex page", "the Department detail drill-through", "the tooltip page", "row-level security"):
-        assert left_out in text.split("## Live demo", 1)[1].split("## ", 1)[0], left_out
-    assert "the cumulative and full-year charts and the Year and Months filters" in text
+        assert left_out in live, left_out
+    assert "on the Trend tab the cumulative and full-year charts (the chart always shows 2023 to 2025)" in live
+    assert "Year and Months" not in live
+    assert {p["displayName"]: p.get("slicers", []) for p in canvas} == SLICERS
+    assert [p["displayName"] for p in canvas if p.get("tiles")] == TILE_PAGES
+    assert (
+        "P&L statement carries the slicers Year, Months, Department and Scenario, Variance analysis and Opex carry "
+        "Year, Months and Department, Department detail carries Year and Months, Trend carries Department and "
+        "P&L line, and Info carries none; each slicer is synced across the pages that carry it, and each page with "
+        "slicers has a Reset button."
+    ) in text
+    assert "A row of KPI tiles sits on P&L statement, Variance analysis, Opex and Department detail, " in text
+    assert "and Trend and Info have none." in text
+
+
+def test_german_readme_states_the_same_facts(model):
+    text = read(ROOT / "README.de.md")
+    (tooltip,) = [p for p in json.loads(read(PAGES))["pages"] if p.get("type") == "Tooltip"]
+    assert "Acht Berichtsseiten im Design Kaldora Dark: sechs Inhaltsseiten und die verborgene Seite" in text
+    size = f"{tooltip['width']} × {tooltip['height']}"
+    assert f"auf einer Fläche von 1280 × 720, die Tooltip-Seite Line tooltip auf {size}" in text
+    assert f"{len(model.tables['_Measures'].measures)} Kennzahlen in `_Measures`" in text
+    assert "dreizehn Prüfwerte unabhängig in Python berechnet" in text
+    assert "abgeglichen" not in text and "geprüfte Sicherheit" not in text
+    live = text.split("## Live-Demo", 1)[1].split("## ", 1)[0]
+    for left_out in (
+        "die Seite Opex",
+        "der Drillthrough Department detail",
+        "die Tooltip-Seite",
+        "die Sicherheit auf Zeilenebene",
+    ):
+        assert left_out in live, left_out
+    assert "auf dem Reiter Trend die kumulierten Linien und die Ganzjahresdiagramme" in live
+    assert "Jahr und Monate" not in live
+    assert (
+        "P&L statement hat die Slicer Year, Months, Department und Scenario, Variance analysis und Opex haben "
+        "Year, Months und Department, Department detail hat Year und Months, Trend hat Department und P&L line, "
+        "und Info hat keine; jeder Slicer ist über die Seiten synchronisiert, die ihn enthalten, und jede Seite "
+        "mit Slicern hat eine Schaltfläche Reset."
+    ) in text
+    assert "Eine Reihe Kennzahlkacheln steht auf P&L statement, Variance analysis, Opex und Department detail; " in text
+    assert "Trend und Info haben keine." in text
 
 
 def test_brief_is_the_same_in_the_readme_and_the_brief():

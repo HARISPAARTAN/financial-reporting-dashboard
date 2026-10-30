@@ -4,7 +4,7 @@
 [![Pages](https://github.com/HARISPAARTAN/financial-reporting-dashboard/actions/workflows/pages.yml/badge.svg)](https://github.com/HARISPAARTAN/financial-reporting-dashboard/actions/workflows/pages.yml)
 [![Release](https://img.shields.io/github/v/release/HARISPAARTAN/financial-reporting-dashboard?sort=semver)](https://github.com/HARISPAARTAN/financial-reporting-dashboard/releases)
 
-Power-BI-Management-GuV für ein fiktives Facility-Services-Unternehmen: ein GuV-Schema mit Zwischensummen und Margen in TMDL, eine Vorzeichenregel für jede Abweichung, Budget nur gegen abgeschlossene Monate, ein Jahresausblick aus Ist und Q4-Forecast, Sicherheit auf Zeilenebene je Abteilung, dreizehn Prüfwerte gegen eine unabhängige Python-Berechnung abgeglichen, dazu eine HTML-Nachbildung als Live-Demo.
+Power-BI-Management-GuV für ein fiktives Facility-Services-Unternehmen: ein GuV-Schema mit Zwischensummen und Margen in TMDL, eine Vorzeichenregel für jede Abweichung, Budget nur gegen abgeschlossene Monate, ein Jahresausblick aus Ist und Q4-Forecast, Sicherheit auf Zeilenebene je Abteilung, dreizehn Prüfwerte unabhängig in Python berechnet und für den Abgleich mit Power BI Desktop aufgelistet, dazu eine HTML-Nachbildung als Live-Demo.
 
 English: [README.md](README.md)
 
@@ -24,11 +24,11 @@ Rebuilt from memory as a demo. The original client's name and data are not used.
 
 [harispaartan.github.io/financial-reporting-dashboard](https://harispaartan.github.io/financial-reporting-dashboard/)
 
-Die Nachbildung ist eine statische Seite mit drei der Berichtsseiten als Reitern (P&L statement, Variance, Trend), denselben Regeln wie der Bericht (Vorzeichenregel, Budget der abgeschlossenen Monate, Ausblick, Status der Abweichung) und den Filtern Jahr, Monate, Abteilung und Szenario, dazu ein Klick auf einen Abteilungsbalken, der Wasserfall und Abweichungstabelle filtert. Sie wird mit ECharts aus den Buchungsdaten gezeichnet, die die Python-Referenz schreibt, läuft im Browser ohne Server und sendet keine Daten; die Filter bleiben nur in diesem Browser gespeichert. Nicht enthalten sind die Seite Opex, der Drillthrough Department detail, die Seite Info (der Abschnitt About ersetzt sie), die Tooltip-Seite, die Abgleichsseite, die Sicherheit auf Zeilenebene und auf dem Reiter Trend die kumulierten Linien, der Jahresvergleich sowie die Filter Jahr und Monate (das Diagramm zeigt immer 2023 bis 2025).
+Die Nachbildung ist eine statische Seite mit drei der Berichtsseiten als Reitern (P&L statement, Variance, Trend), denselben Regeln wie der Bericht (Vorzeichenregel, Budget der abgeschlossenen Monate, Ausblick, Status der Abweichung) und den Filtern Jahr, Monate, Abteilung und Szenario, dazu ein Klick auf einen Abteilungsbalken, der Wasserfall und Abweichungstabelle filtert. Sie wird mit ECharts aus den Buchungsdaten gezeichnet, die die Python-Referenz schreibt, läuft im Browser ohne Server und sendet keine Daten; die Filter bleiben nur in diesem Browser gespeichert. Nicht enthalten sind die Seite Opex, der Drillthrough Department detail, die Seite Info (der Abschnitt About ersetzt sie), die Tooltip-Seite, die Abgleichsseite, die Sicherheit auf Zeilenebene und auf dem Reiter Trend die kumulierten Linien und die Ganzjahresdiagramme (das Diagramm zeigt immer 2023 bis 2025).
 
 ## Was es kann
 
-Acht Berichtsseiten im Design Kaldora Dark: sechs Inhaltsseiten und die verborgene Seite Reconciliation auf einer Fläche von 1280 × 720, die Tooltip-Seite Line tooltip auf 320 × 200. Die Inhaltsseiten teilen eine Kopfzeile mit dem Datenstand und einer Schaltfläche Reset, eine Slicer-Zeile (Year, Months, Department), die über die Seiten synchronisiert ist, und eine Reihe Kennzahlkacheln gegen Budget.
+Acht Berichtsseiten im Design Kaldora Dark: sechs Inhaltsseiten und die verborgene Seite Reconciliation auf einer Fläche von 1280 × 720, die Tooltip-Seite Line tooltip auf 320 × 200. P&L statement hat die Slicer Year, Months, Department und Scenario, Variance analysis und Opex haben Year, Months und Department, Department detail hat Year und Months, Trend hat Department und P&L line, und Info hat keine; jeder Slicer ist über die Seiten synchronisiert, die ihn enthalten, und jede Seite mit Slicern hat eine Schaltfläche Reset. Eine Reihe Kennzahlkacheln steht auf P&L statement, Variance analysis, Opex und Department detail; Trend und Info haben keine.
 
 - **P&L statement**: Umsatz, Bruttomarge in %, EBITDA, EBITDA-Marge in % und EBIT gegen Budget; eine Matrix der zehn GuV-Zeilen mit Untergruppen und Konten darunter, eine Spalte je Monat, YTD und Full year; der Slicer Scenario schaltet die Matrix zwischen Actual, Budget und Forecast (dem Ausblick) um.
 - **Variance analysis**: Budget-EBIT, Ist-EBIT, die EBIT-Abweichung und der Jahresausblick gegen Budget; die EBITDA-Abweichung je Abteilung; ein Wasserfall vom Budget-EBIT zum Ist-EBIT nach Kontengruppe; die Abweichungsmatrix mit einem Status je Zeile.
@@ -96,10 +96,12 @@ Dieser Nachbau ergänzt:
 - einen schriftlichen Auftrag mit Nutzenden, Umfang und Abnahmekriterien sowie ein dokumentiertes Datenmodell mit dem GuV-Schema als eigener Tabelle;
 - die Vorzeichenregel als Entscheidungsdokument, sodass Erlös- und Aufwandszeilen ihre Abweichungen nach einer Regel einfärben;
 - Modell und Bericht als prüfbaren Text (TMDL und PBIR) mit Offline-Lint-Tests und Schemaprüfungen;
-- den Abgleich von dreizehn Prüfwerten gegen eine unabhängige pandas-Berechnung, auch des Umsatzes, den eine Abteilungsleitung unter der Rolle sieht;
-- geprüfte Sicherheit auf Zeilenebene und ein Skript für die rollenfreie Kopie, die Publish to web braucht;
+- dreizehn Prüfwerte unabhängig in Python berechnet und für den Abgleich mit Power BI Desktop aufgelistet, darunter der Umsatz, den eine Abteilungsleitung unter der Rolle sieht;
+- Sicherheit auf Zeilenebene je Abteilung (eine Rolle mit einer Sicherheitstabelle) und ein Skript für die rollenfreie Kopie, die Publish to web braucht;
 - Übergabenotizen zum Monatsabschluss, zu neuen Konten, Kostenstellen und Abteilungsleitungen;
 - CI mit `uv sync --locked` und festgelegten Actions sowie eine Live-Nachbildung mit getesteter GuV-Rechnung.
+
+Die echten Kontensalden und das echte Budget des Kundenunternehmens, der Produktivbetrieb und die Abnahme durch das Kundenunternehmen sind nicht übernommen, und die Validierung in Power BI Desktop steht noch aus (siehe Status).
 
 ## Lizenz und Hinweis zu den Daten
 
