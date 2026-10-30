@@ -5,7 +5,7 @@ The images the READMEs show. Images 01 to 10 come from the Power BI Desktop sess
 | File | Shows |
 |---|---|
 | `01-pnl-statement.png` | P&L statement: five KPI tiles against budget, the matrix with Revenue and Operating expenses expanded |
-| `02-variance-analysis.png` | Variance analysis: the EBIT tiles, EBITDA variance by department, the waterfall from budget EBIT to actual EBIT, the variance matrix |
+| `02-variance-analysis.png` | Variance analysis: the EBIT tiles, EBITDA variance by department, the waterfall of the EBIT variance by account group, the variance matrix |
 | `03-trend.png` | Trend: the monthly line of EBITDA with the tooltip page open over a month, the cumulative lines and the full year |
 | `04-opex.png` | Opex: the tiles, the treemap by subgroup and account, opex by department, the largest variances |
 | `05-department-detail.png` | Department detail after the drill-through from the Security Services bar |

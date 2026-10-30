@@ -649,6 +649,7 @@ def _page_json(page: dict, spec: dict, visuals: list[dict] | None = None) -> dic
             "name": stable_name(page["id"], "binding"),
             "type": "Drillthrough",
             "referenceScope": "Default",
+            "acceptsFilterContext": "None",
             "parameters": [{"name": stable_name(page["id"], "parameter"), "boundFilter": bound, "fieldExpr": field}],
         }
         data["filterConfig"] = {

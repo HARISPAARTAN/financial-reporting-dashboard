@@ -137,8 +137,13 @@ def test_readme_facts_match_the_project(model):
     live = text.split("## Live demo", 1)[1].split("## ", 1)[0]
     for left_out in ("the Opex page", "the Department detail drill-through", "the tooltip page", "row-level security"):
         assert left_out in live, left_out
-    assert "on the Trend tab the cumulative and full-year charts (the chart always shows 2023 to 2025)" in live
+    variance_out = "on the Variance tab the four EBIT tiles and the subgroup and account rows of the variance matrix"
+    trend_out = "on the Trend tab the cumulative and full-year charts (the chart always shows 2023 to 2025)"
+    assert variance_out in live and trend_out in live
     assert "Year and Months" not in live
+    architecture_out = read(DOCS / "architecture.md").split("What the replica leaves out:", 1)[1].splitlines()[0]
+    assert variance_out in architecture_out and trend_out in architecture_out
+    assert "Year and Months" not in architecture_out
     assert {p["displayName"]: p.get("slicers", []) for p in canvas} == SLICERS
     assert [p["displayName"] for p in canvas if p.get("tiles")] == TILE_PAGES
     assert (
@@ -168,6 +173,10 @@ def test_german_readme_states_the_same_facts(model):
         "die Sicherheit auf Zeilenebene",
     ):
         assert left_out in live, left_out
+    variance_out = (
+        "auf dem Reiter Variance die vier EBIT-Kacheln und die Untergruppen- und Kontenzeilen der Abweichungsmatrix"
+    )
+    assert variance_out in live
     assert "auf dem Reiter Trend die kumulierten Linien und die Ganzjahresdiagramme" in live
     assert "Jahr und Monate" not in live
     assert (

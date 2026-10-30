@@ -221,6 +221,8 @@ def special_page_problems(report):
         out.append("Department detail is not a visible drill-through page")
     if [list(iter_fields(f)) for f in detail.drillthrough_fields] != [[("DimCostCentre", "Name", "Column")]]:
         out.append(f"Department detail drills through {detail.drillthrough_fields}")
+    if binding.get("acceptsFilterContext") != "None":
+        out.append("Department detail accepts the filter context of the source visual")
     if [f.get("howCreated") for f in filters] != ["Drillthrough"] or filters[0]["name"] != (
         binding.get("parameters") or [{}]
     )[0].get("boundFilter"):
@@ -539,6 +541,9 @@ def test_mutation_special_pages_are_caught(report):
     page(broken, "Line tooltip").visibility = None
     page(broken, "Reconciliation").visibility = None
     assert len(special_page_problems(broken)) == 2
+    flipped = copy.deepcopy(report)
+    page(flipped, "Department detail").raw["pageBinding"]["acceptsFilterContext"] = "Default"
+    assert special_page_problems(flipped) == ["Department detail accepts the filter context of the source visual"]
 
 
 def test_mutation_formatting_and_interactions_are_caught(report):

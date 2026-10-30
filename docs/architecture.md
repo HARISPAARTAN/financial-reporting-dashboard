@@ -48,7 +48,7 @@ The generic parts of the tooling still build the sibling's report byte for byte;
 
 `web/index.html` is one page with three tabs (P&L statement, Variance, Trend) and hash routes (`#variance`). `pnl.js` is a pure ES module without DOM access: it implements the line values, the outlook, the closed-month budget, the variance and the favourable flag on the facts of `kaldora.json`, and `tests/js/pnl.test.mjs` recomputes the four reference states S1 to S4 with it. `charts.js` builds the ECharts options (department bars, the waterfall as stacked bars on a transparent base, the trend lines); `app.js` wires the filter bar, the tabs, the tables and the kit's filter bus, and remembers the view under `pf.financial-reporting-dashboard.v1`.
 
-What the replica leaves out: the Opex page, the Department detail drill-through, the Info page (the About section replaces it), the tooltip page, the reconciliation page, row-level security, the bookmark (the Reset button does its job), the cumulative and full-year charts of Trend, Year and Months on the Trend tab (the chart always shows 2023 to 2025), and any export. The report is dark only; the replica also follows the light theme of the portfolio.
+What the replica leaves out: the Opex page, the Department detail drill-through, the Info page (the About section replaces it), the tooltip page, the reconciliation page, row-level security, on the Variance tab the four EBIT tiles and the subgroup and account rows of the variance matrix, the bookmark (the Reset button does its job), on the Trend tab the cumulative and full-year charts (the chart always shows 2023 to 2025), and any export. The report is dark only; the replica also follows the light theme of the portfolio.
 
 ## CI
 

@@ -369,15 +369,32 @@ function render() {
 
 // ---------------------------------------------------------------- start
 
+/** "2025-09" as "Sep 2025". */
+const monthLabel = (yearMonth) => {
+  const [year, month] = yearMonth.split('-').map(Number);
+  return `${MONTH_NAMES[month - 1]} ${year}`;
+};
+
+/** The text of the "Data as of" pill: the last actual month and the last forecast month, both from `meta`. */
+function dataAsOf(meta) {
+  const [year, month] = meta.firstMonth.split('-').map(Number);
+  const end = month - 1 + meta.months - 1;
+  const last = `${year + Math.floor(end / 12)}-${(end % 12) + 1}`;
+  return `Actuals through ${monthLabel(meta.lastActual)} · forecast through ${monthLabel(last)}`;
+}
+
 async function start() {
   mountBanner({ repoUrl: REPO });
   mountThemeToggle($('theme-toggle'));
   const app = $('app');
+  let asOf;
   try {
     if (!globalThis.echarts) throw new Error('the chart library did not load');
     const response = await fetch('assets/data/kaldora.json');
     if (!response.ok) throw new Error(`kaldora.json answered ${response.status}`);
-    model = createModel(await response.json());
+    const data = await response.json();
+    model = createModel(data);
+    asOf = dataAsOf(data.meta);
   } catch (error) {
     $('loading').className = 'app-error';
     $('loading').textContent = `The data could not be loaded (${error.message}). Reload the page to try again.`;
@@ -385,7 +402,7 @@ async function start() {
     return;
   }
   $('loading').remove();
-  $('data-as-of').textContent = 'Actuals through Sep 2025 · forecast through Dec 2025';
+  $('data-as-of').textContent = asOf;
   const themes = registerThemes(globalThis.echarts);
   host = charts.createChartHost(globalThis.echarts, themes, globalThis.pfTheme?.get() ?? 'dark');
   document.addEventListener('pf:theme', (e) => {

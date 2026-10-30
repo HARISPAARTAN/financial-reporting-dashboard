@@ -127,7 +127,7 @@ Budget of the closed months only, the basis of every comparison with actuals.
 
 ```dax
 VAR _last = [Last actual date]
-RETURN CALCULATE([Budget], KEEPFILTERS(DimDate[Date] <= _last))
+RETURN CALCULATE([Budget], FILTER(VALUES(DimDate[Date]), DimDate[Date] <= _last))
 ```
 
 Folder `Scenarios` · format string definition `IF([Is ratio line], "0.0 %", "#,0,;(#,0,);0")`.
@@ -486,7 +486,7 @@ DimCostCentre[Cost centre] IN CALCULATETABLE(VALUES(Security[Cost centre]), Secu
 - `Favourable label` and `Favourable colour` test for a blank status before `SWITCH`: in DAX a blank equals 0 in a comparison, so a plain `SWITCH` would show "On plan" and the muted colour on a row without any variance.
 - `Favourable` counts a variance within 1 % of the closed-month budget, or within 0.1 pp on a margin line, as on plan (0). A line with a blank `Variance %` (a zero budget) is never on plan by that rule; it is favourable or unfavourable by its sign.
 - `Outlook` filters one table of scenario and date pairs (Actual up to `[Last actual date]`, Forecast after it) instead of adding two measures, so the ratio lines divide the outlook subtotal by the outlook revenue, not two separate sums.
-- `Budget (closed months)` keeps the slicers with `KEEPFILTERS`, so a month range ending before September still compares the same months on both sides.
+- `Budget (closed months)` keeps the dates that the Year and Months filters leave (`VALUES(DimDate[Date])`) up to `[Last actual date]`, the pattern `Outlook` uses, so a month range ending before September still compares the same months on both sides.
 - `P&L Matrix` reads the column from the disconnected `PnLColumn` table; YTD runs from January to the last month of the month range, and Full year shows the budget under the scenario Budget and the outlook otherwise.
 - `Personnel cost` is a positive amount (`-[Amount]` over both personnel subgroups), so `Personnel cost % of revenue` is a positive share of revenue.
 - `Check value` holds one branch per reconciliation check, each a `CALCULATE` with `REMOVEFILTERS()` and the filters of the check ([reconciliation](reconciliation.md)); `REMOVEFILTERS` does not remove the role, so under View as the checks show the role's departments.

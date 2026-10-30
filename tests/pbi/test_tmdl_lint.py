@@ -151,7 +151,8 @@ DEFINITIONS = {  # spec section 7, flattened
         '|| (DimScenario[Scenario] = "Forecast" && DimDate[Date] > _last)) RETURN CALCULATE([P&L Value], _cells)'
     ),
     "Budget (closed months)": (
-        "VAR _last = [Last actual date] RETURN CALCULATE([Budget], KEEPFILTERS(DimDate[Date] <= _last))"
+        "VAR _last = [Last actual date] "
+        "RETURN CALCULATE([Budget], FILTER(VALUES(DimDate[Date]), DimDate[Date] <= _last))"
     ),
     "P&L Statement": (
         'SWITCH(SELECTEDVALUE(DimScenario[Scenario], "Actual"), "Budget", [Budget], "Forecast", [Outlook], [Actual])'

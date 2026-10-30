@@ -70,7 +70,7 @@ export function departmentBars(rows, c, { selected = null, motion = true, narrow
 }
 
 /**
- * The waterfall steps from budget EBIT to actual EBIT: one step per account group (its profit impact, in the order
+ * The waterfall steps of the EBIT variance: one step per account group (its profit impact, in the order
  * given) and the EBIT variance as the total column. Each step runs from `start` to `end` in cents.
  */
 export function waterfallSteps(view, groups) {

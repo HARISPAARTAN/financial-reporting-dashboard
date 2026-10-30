@@ -85,7 +85,7 @@ table _Measures
 	/// Budget of the closed months only, the basis of every comparison with actuals.
 	measure 'Budget (closed months)' =
 			VAR _last = [Last actual date]
-			RETURN CALCULATE([Budget], KEEPFILTERS(DimDate[Date] <= _last))
+			RETURN CALCULATE([Budget], FILTER(VALUES(DimDate[Date]), DimDate[Date] <= _last))
 		displayFolder: Scenarios
 		lineageTag: 32bbed15-f8fb-5563-b9ab-6347310678b4
 

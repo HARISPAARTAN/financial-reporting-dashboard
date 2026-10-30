@@ -30,6 +30,7 @@
   "height": 720,
   "name": "department-detail",
   "pageBinding": {
+    "acceptsFilterContext": "None",
     "name": "92316dcd4a1a581ea312",
     "parameters": [
       {

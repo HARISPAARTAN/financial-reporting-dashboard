@@ -288,21 +288,6 @@
               "queryRef": "DimAccount.Account label"
             },
             {
-              "displayName": "Department",
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "DimCostCentre"
-                    }
-                  },
-                  "Property": "Name"
-                }
-              },
-              "nativeQueryRef": "Name",
-              "queryRef": "DimCostCentre.Name"
-            },
-            {
               "field": {
                 "Measure": {
                   "Expression": {
