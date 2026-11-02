@@ -10,7 +10,7 @@ English: [README.md](README.md)
 
 ## Status
 
-- CI am 2026-11-02 für Commit `c76b48d` bestanden: ruff, die Python-Tests, die Prüfungen, dass Daten, Nachbildungsdaten und Theme einem frischen Lauf entsprechen, der Scrub, die Tests der P&L-Rechnung und der Diagrammoptionen der Nachbildung, Kontrast, Seitengewicht, die Links und der Kit-Abgleich mit portfolio-kit v0.1.0 ([Lauf](<run url>)).
+- CI am 2026-11-02 für Commit `c76b48d` bestanden: ruff, die Python-Tests, die Prüfungen, dass Daten, Nachbildungsdaten und Theme einem frischen Lauf entsprechen, der Scrub, die Tests der P&L-Rechnung und der Diagrammoptionen der Nachbildung, Kontrast, Seitengewicht, die Links und der Kit-Abgleich mit portfolio-kit v0.1.0 ([Lauf](https://github.com/HARISPAARTAN/financial-reporting-dashboard/actions/runs/41537280582)).
 - Die Nachbildung auf GitHub Pages hat am 2026-11-02 die Browserprüfungen von `tools/checks/shots.mjs` und `tools/checks/replica.mjs` bestanden: drei Reiter bei 1440 und 390 px in beiden Themes, die fünf KPI-Werte des Ausgangszustands, die aufgeklappten Zeilen, die Abteilungsbalken und Zurücksetzen, keine Anfrage außerhalb der Seite und kein Konsolenfehler.
 - Am 2026-11-02 in Power BI Desktop 2.159.883.0 geprüft: Das Modell lädt die Dateien aus `data/`, jede Seite wird ohne Fehler angezeigt, die dreizehn Abgleichsprüfungen stimmen mit der pandas-Referenz überein, und der Umsatz, den die Leitung Security Services unter der Rolle `Department head` sieht, entspricht R13 ([Abgleich](docs/reconciliation.md)).
 - Release v0.1.0 (2026-11-02): [GitHub Releases](https://github.com/HARISPAARTAN/financial-reporting-dashboard/releases/tag/v0.1.0).

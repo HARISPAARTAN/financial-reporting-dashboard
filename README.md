@@ -10,7 +10,7 @@ Deutsch: [README.de.md](README.de.md)
 
 ## Status
 
-- CI passed on 2026-11-02 for commit `c76b48d`: ruff, the Python tests, the checks that the data, the replica data and the theme equal a fresh build, the scrub, the tests of the replica's P&L engine and chart options, contrast, page weight, the links and the kit check against portfolio-kit v0.1.0 ([run](<run url>)).
+- CI passed on 2026-11-02 for commit `c76b48d`: ruff, the Python tests, the checks that the data, the replica data and the theme equal a fresh build, the scrub, the tests of the replica's P&L engine and chart options, contrast, page weight, the links and the kit check against portfolio-kit v0.1.0 ([run](https://github.com/HARISPAARTAN/financial-reporting-dashboard/actions/runs/41537280582)).
 - The replica on GitHub Pages passed the browser checks of `tools/checks/shots.mjs` and `tools/checks/replica.mjs` on 2026-11-02: three tabs at 1440 and 390 px in both themes, the five KPI values of the headline state, the expanded rows, the department bars and Reset, no request outside the page and no console error.
 - Validated in Power BI Desktop 2.159.883.0 on 2026-11-02: the model refreshes from the files in `data/`, every page renders without an error, the thirteen reconciliation checks match the pandas reference, and the revenue the head of Security Services sees under the role `Department head` equals R13 ([reconciliation](docs/reconciliation.md)).
 - Release v0.1.0 (2026-11-02): [GitHub Releases](https://github.com/HARISPAARTAN/financial-reporting-dashboard/releases/tag/v0.1.0).
