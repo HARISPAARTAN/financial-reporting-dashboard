@@ -10,7 +10,7 @@ The images the READMEs show. Images 01 to 10 come from the Power BI Desktop sess
 | `04-opex.png` | Opex: the tiles, the treemap by subgroup and account, opex by department, the ten largest overspends |
 | `05-department-detail.png` | Department detail after the drill-through from the Security Services bar |
 | `06-info.png` | Info: what the report shows, the sign convention and definitions, the data files, the security note and the sources |
-| `07-line-tooltip.png` | the tooltip page Line tooltip on its own (320 × 296): Actual, Budget (closed months), Variance, Variance %, Outlook |
+| `07-line-tooltip.png` | the tooltip page Line tooltip on its own (320 × 296): Actual, Budget (closed), Variance, Variance %, Outlook |
 | `08-model.png` | the model view with the five relationships |
 | `09-rls-head-of-operations.png` | P&L statement under View as for the Head of Operations: the four operating departments |
 | `10-reconciliation.png` | the hidden page Reconciliation with R1 to R13 |

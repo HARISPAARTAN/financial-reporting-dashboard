@@ -4,14 +4,14 @@
 [![Pages](https://github.com/HARISPAARTAN/financial-reporting-dashboard/actions/workflows/pages.yml/badge.svg)](https://github.com/HARISPAARTAN/financial-reporting-dashboard/actions/workflows/pages.yml)
 [![Release](https://img.shields.io/github/v/release/HARISPAARTAN/financial-reporting-dashboard?sort=semver)](https://github.com/HARISPAARTAN/financial-reporting-dashboard/releases)
 
-Power BI management P&L for a fictional facility-services company: a P&L layout with subtotals and margins in TMDL, one sign convention for every variance, budget against closed months only, a full-year outlook from actuals and the Q4 forecast, row-level security per department, the thirteen headline checks computed independently in pandas and listed for the Desktop reconciliation, and a live HTML replica.
+Power BI management P&L for a fictional facility-services company: a P&L layout with subtotals and margins in TMDL, one sign convention for every variance, budget against closed months only, a full-year outlook from actuals and the Q4 forecast, row-level security per department, the thirteen headline checks reconciled against an independent Python computation, and a live HTML replica.
 
 Deutsch: [README.de.md](README.de.md)
 
 ## Status
 
 - The data files equal a fresh build of `tools/make_data.py`, and the offline checks of the model and the report pass (`uv run pytest`).
-- Not yet opened in Power BI Desktop.
+- Validated in Power BI Desktop 2.159.883.0 on 2026-11-02: the model refreshes from the files in `data/`, every page renders without an error, the thirteen reconciliation checks match the pandas reference, and the revenue the head of Security Services sees under the role `Department head` equals R13 ([reconciliation](docs/reconciliation.md)).
 - Not released yet.
 
 ## Client brief
@@ -24,11 +24,15 @@ Rebuilt from memory as a demo. The original client's name and data are not used.
 
 [harispaartan.github.io/financial-reporting-dashboard](https://harispaartan.github.io/financial-reporting-dashboard/)
 
+![The HTML replica at 1440 px: the P&L statement tab with five KPI tiles against budget and the P&L table](docs/screenshots/11-replica-1440.png)
+
 The replica is a static page with three of the report pages as tabs (P&L statement, Variance, Trend), the same rules as the report (sign convention, closed-month budget, outlook, favourable status) and the filters Year, Months, Department and Scenario, plus a click on a department bar that filters the waterfall and the variance table. It is drawn with ECharts from the ledger facts that the Python reference writes, runs in the browser without a server and sends no data anywhere; your filters stay in this browser only. It leaves out the Opex page, the Department detail drill-through, the Info page (the About section replaces it), the tooltip page, the reconciliation page, row-level security, on the Variance tab the four EBIT tiles and the subgroup and account rows of the variance matrix, and on the Trend tab the cumulative and full-year charts (the chart always shows 2023 to 2025).
+
+![The replica at 390 px: the filters stacked, the tiles in two columns and the P&L table with the months hidden](docs/screenshots/12-replica-390.png)
 
 ## What it does
 
-Eight report pages with the theme Kaldora Dark: six content pages and the hidden page Reconciliation on a 1280 × 720 canvas, and the tooltip page Line tooltip on 320 × 200. P&L statement carries the slicers Year, Months, Department and Scenario, Variance analysis and Opex carry Year, Months and Department, Department detail carries Year and Months, Trend carries Department and P&L line, and Info carries none; each slicer is synced across the pages that carry it, and each page with slicers has a Reset button. A row of KPI tiles sits on P&L statement, Variance analysis, Opex and Department detail, and Trend and Info have none.
+Eight report pages with the theme Kaldora Dark: six content pages and the hidden page Reconciliation on a 1280 × 720 canvas, and the tooltip page Line tooltip on 320 × 296. P&L statement carries the slicers Year, Months, Department and Scenario, Variance analysis and Opex carry Year, Months and Department, Department detail carries Year and Months, Trend carries Department and P&L line, and Info carries none; each slicer is synced across the pages that carry it, and each page with slicers has a Reset button. A row of KPI tiles sits on P&L statement, Variance analysis, Opex and Department detail, and Trend and Info have none.
 
 - **P&L statement**: revenue, gross margin %, EBITDA, EBITDA margin % and EBIT against budget; a matrix of the ten P&L lines with subgroups and accounts below them, one column per month, YTD and Full year; the Scenario slicer switches the matrix between Actual, Budget and Forecast (the outlook).
 - **Variance analysis**: budget EBIT, actual EBIT, the EBIT variance and the full-year outlook against budget; EBITDA variance by department; a waterfall of the EBIT variance by account group; the variance matrix with a status per line.
@@ -37,9 +41,25 @@ Eight report pages with the theme Kaldora Dark: six content pages and the hidden
 - **Department detail**: one department's P&L and EBITDA by month, reached by a drill-through from a department bar.
 - **Info**: what the report shows, the sign convention, the definitions, the data files and the sources.
 
+| P&L statement | Variance analysis |
+|---|---|
+| ![P&L statement page with five KPI tiles against budget and the P&L matrix, Revenue and Operating expenses expanded](docs/screenshots/01-pnl-statement.png) | ![Variance analysis page with the EBIT tiles, EBITDA variance by department, the waterfall from budget EBIT to actual EBIT and the variance matrix](docs/screenshots/02-variance-analysis.png) |
+
+| Trend | Opex |
+|---|---|
+| ![Trend page with actual, budget and forecast EBITDA by month and the tooltip page open over a month](docs/screenshots/03-trend.png) | ![Opex page with the opex tiles, the treemap by subgroup and account, opex by department and the largest variances](docs/screenshots/04-opex.png) |
+
+| Department detail | Info |
+|---|---|
+| ![Department detail page after the drill-through from the Security Services bar: its P&L and EBITDA by month](docs/screenshots/05-department-detail.png) | ![Info page with what the report shows, the sign convention, the definitions, the data files and the sources](docs/screenshots/06-info.png) |
+
+![The tooltip page Line tooltip: Actual, Budget (closed), Variance, Variance % and Outlook of the month under the pointer](docs/screenshots/07-line-tooltip.png)
+
 Budget is compared with the closed months only, so January to September 2025 of actuals meet January to September of the budget. Full year means actuals to the last closed month plus the forecast. Within 1 % of budget (0.1 pp on a margin) counts as on plan.
 
 Department heads see only their own department: the role `Department head` filters by the sign-in address through the table `Security`, so a new head or a head for several departments is a new row in `data/security.csv`, not a model change.
+
+![P&L statement under View as for the Head of Operations: the Department slicer lists the four operating departments](docs/screenshots/09-rls-head-of-operations.png)
 
 ## How it works
 
@@ -47,9 +67,13 @@ Department heads see only their own department: the role `Department head` filte
 
 The seeded generator writes the client's files: the ledger export, the budget workbook with the forecast sheet and four CSV files. Power Query in the Power BI project reads each file in its own staging query and unpivots the budget sheets; the model and the report are plain text (TMDL and PBIR). Independently, `tools/reference.py` computes the measures with pandas in integer cents. The two meet in [the reconciliation](docs/reconciliation.md): thirteen headline numbers from Python and from Power BI Desktop must match. The same reference builds the replica's data. More in [docs/architecture.md](docs/architecture.md).
 
+![The hidden page Reconciliation in Power BI Desktop: the thirteen checks R1 to R13 that the pandas reference also computes](docs/screenshots/10-reconciliation.png)
+
 ## Data model
 
 `FactGL` holds actuals, budget and forecast in one table, one row per scenario, month, cost centre and account, with `DimDate`, `DimAccount`, `DimCostCentre`, `DimScenario` and the layout table `DimPnLLine`; the disconnected tables `PnLColumn` (matrix columns) and `ReconCheck` (the reconciliation), the hidden `Security` table for row-level security, and 36 measures in `_Measures`. Every amount is stored as its contribution to profit, income plus and expense minus. Revenue and cost lines show in display sign, so costs appear as positive amounts, while subtotals and margins are computed from the signed values. A variance is favourable when it raises profit, whether the line is income or cost. Tables, columns and the generator rules are in [docs/data-model.md](docs/data-model.md), every measure with its DAX in [docs/measures.md](docs/measures.md).
+
+![The model view in Power BI Desktop: FactGL with DimDate, DimAccount, DimCostCentre and DimScenario, DimPnLLine next to FactGL and linked to DimAccount, and the disconnected tables below](docs/screenshots/08-model.png)
 
 ## Getting started
 
@@ -94,12 +118,12 @@ This rebuild adds:
 - a written brief with users, scope and acceptance criteria, and a documented data model with the P&L layout as its own table;
 - the sign convention as a decision record, so income and cost lines colour their variances by one rule;
 - the model and the report as reviewable text (TMDL and PBIR) with offline lint tests and schema checks;
-- the thirteen headline checks computed independently in pandas and listed for the Desktop reconciliation, including the revenue a department head sees under the role;
+- thirteen headline checks reconciled against an independent pandas computation, including the revenue a department head sees under the role;
 - row-level security per department (a role with a security table), and a script for the role-free copy that Publish to web needs;
 - handover notes for the monthly close, new accounts, cost centres and department heads;
 - CI with `uv sync --locked` and pinned actions, and a live replica with a tested P&L engine.
 
-The client's real ledger and budget, the production use and the acceptance by the client are not carried over, and the Desktop validation is still to run (see Status).
+The client's real ledger and budget, the production use and the acceptance by the client are not carried over; the Desktop validation is recorded under Status and in `docs/reconciliation.md`.
 
 ## Licence and data note
 

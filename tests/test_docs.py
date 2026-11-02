@@ -163,8 +163,8 @@ def test_german_readme_states_the_same_facts(model):
     size = f"{tooltip['width']} × {tooltip['height']}"
     assert f"auf einer Fläche von 1280 × 720, die Tooltip-Seite Line tooltip auf {size}" in text
     assert f"{len(model.tables['_Measures'].measures)} Kennzahlen in `_Measures`" in text
-    assert "dreizehn Prüfwerte unabhängig in Python berechnet" in text
-    assert "abgeglichen" not in text and "geprüfte Sicherheit" not in text
+    # the wording after the Desktop session: the checks are reconciled, not only computed
+    assert "den Abgleich von dreizehn Prüfwerten gegen eine unabhängige pandas-Berechnung" in text
     live = text.split("## Live-Demo", 1)[1].split("## ", 1)[0]
     for left_out in (
         "die Seite Opex",

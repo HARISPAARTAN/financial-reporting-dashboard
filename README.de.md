@@ -4,14 +4,14 @@
 [![Pages](https://github.com/HARISPAARTAN/financial-reporting-dashboard/actions/workflows/pages.yml/badge.svg)](https://github.com/HARISPAARTAN/financial-reporting-dashboard/actions/workflows/pages.yml)
 [![Release](https://img.shields.io/github/v/release/HARISPAARTAN/financial-reporting-dashboard?sort=semver)](https://github.com/HARISPAARTAN/financial-reporting-dashboard/releases)
 
-Power-BI-Management-GuV für ein fiktives Facility-Services-Unternehmen: ein GuV-Schema mit Zwischensummen und Margen in TMDL, eine Vorzeichenregel für jede Abweichung, Budget nur gegen abgeschlossene Monate, ein Jahresausblick aus Ist und Q4-Forecast, Sicherheit auf Zeilenebene je Abteilung, dreizehn Prüfwerte unabhängig in Python berechnet und für den Abgleich mit Power BI Desktop aufgelistet, dazu eine HTML-Nachbildung als Live-Demo.
+Power-BI-Management-GuV für ein fiktives Facility-Services-Unternehmen: ein GuV-Schema mit Zwischensummen und Margen in TMDL, eine Vorzeichenregel für jede Abweichung, Budget nur gegen abgeschlossene Monate, ein Jahresausblick aus Ist und Q4-Forecast, Sicherheit auf Zeilenebene je Abteilung, dreizehn Prüfwerte gegen eine unabhängige Python-Berechnung abgeglichen, dazu eine HTML-Nachbildung als Live-Demo.
 
 English: [README.md](README.md)
 
 ## Status
 
 - Die Datendateien entsprechen einem frischen Lauf von `tools/make_data.py`, und die Offline-Prüfungen von Modell und Bericht bestehen (`uv run pytest`).
-- Noch nicht in Power BI Desktop geöffnet.
+- Am 2026-11-02 in Power BI Desktop 2.159.883.0 geprüft: Das Modell lädt die Dateien aus `data/`, jede Seite wird ohne Fehler angezeigt, die dreizehn Abgleichsprüfungen stimmen mit der pandas-Referenz überein, und der Umsatz, den die Leitung Security Services unter der Rolle `Department head` sieht, entspricht R13 ([Abgleich](docs/reconciliation.md)).
 - Noch kein Release.
 
 ## Kundenauftrag
@@ -24,11 +24,15 @@ Rebuilt from memory as a demo. The original client's name and data are not used.
 
 [harispaartan.github.io/financial-reporting-dashboard](https://harispaartan.github.io/financial-reporting-dashboard/)
 
+![Die HTML-Nachbildung bei 1440 px: der Reiter P&L statement mit fünf Kennzahlkacheln gegen Budget und der GuV-Tabelle](docs/screenshots/11-replica-1440.png)
+
 Die Nachbildung ist eine statische Seite mit drei der Berichtsseiten als Reitern (P&L statement, Variance, Trend), denselben Regeln wie der Bericht (Vorzeichenregel, Budget der abgeschlossenen Monate, Ausblick, Status der Abweichung) und den Filtern Jahr, Monate, Abteilung und Szenario, dazu ein Klick auf einen Abteilungsbalken, der Wasserfall und Abweichungstabelle filtert. Sie wird mit ECharts aus den Buchungsdaten gezeichnet, die die Python-Referenz schreibt, läuft im Browser ohne Server und sendet keine Daten; die Filter bleiben nur in diesem Browser gespeichert. Nicht enthalten sind die Seite Opex, der Drillthrough Department detail, die Seite Info (der Abschnitt About ersetzt sie), die Tooltip-Seite, die Abgleichsseite, die Sicherheit auf Zeilenebene, auf dem Reiter Variance die vier EBIT-Kacheln und die Untergruppen- und Kontenzeilen der Abweichungsmatrix und auf dem Reiter Trend die kumulierten Linien und die Ganzjahresdiagramme (das Diagramm zeigt immer 2023 bis 2025).
+
+![Die Nachbildung bei 390 px: die Filter untereinander, die Kacheln in zwei Spalten und die GuV-Tabelle ohne die Monate](docs/screenshots/12-replica-390.png)
 
 ## Was es kann
 
-Acht Berichtsseiten im Design Kaldora Dark: sechs Inhaltsseiten und die verborgene Seite Reconciliation auf einer Fläche von 1280 × 720, die Tooltip-Seite Line tooltip auf 320 × 200. P&L statement hat die Slicer Year, Months, Department und Scenario, Variance analysis und Opex haben Year, Months und Department, Department detail hat Year und Months, Trend hat Department und P&L line, und Info hat keine; jeder Slicer ist über die Seiten synchronisiert, die ihn enthalten, und jede Seite mit Slicern hat eine Schaltfläche Reset. Eine Reihe Kennzahlkacheln steht auf P&L statement, Variance analysis, Opex und Department detail; Trend und Info haben keine.
+Acht Berichtsseiten im Design Kaldora Dark: sechs Inhaltsseiten und die verborgene Seite Reconciliation auf einer Fläche von 1280 × 720, die Tooltip-Seite Line tooltip auf 320 × 296. P&L statement hat die Slicer Year, Months, Department und Scenario, Variance analysis und Opex haben Year, Months und Department, Department detail hat Year und Months, Trend hat Department und P&L line, und Info hat keine; jeder Slicer ist über die Seiten synchronisiert, die ihn enthalten, und jede Seite mit Slicern hat eine Schaltfläche Reset. Eine Reihe Kennzahlkacheln steht auf P&L statement, Variance analysis, Opex und Department detail; Trend und Info haben keine.
 
 - **P&L statement**: Umsatz, Bruttomarge in %, EBITDA, EBITDA-Marge in % und EBIT gegen Budget; eine Matrix der zehn GuV-Zeilen mit Untergruppen und Konten darunter, eine Spalte je Monat, YTD und Full year; der Slicer Scenario schaltet die Matrix zwischen Actual, Budget und Forecast (dem Ausblick) um.
 - **Variance analysis**: Budget-EBIT, Ist-EBIT, die EBIT-Abweichung und der Jahresausblick gegen Budget; die EBITDA-Abweichung je Abteilung; ein Wasserfall der EBIT-Abweichung nach Kontengruppe; die Abweichungsmatrix mit einem Status je Zeile.
@@ -37,9 +41,25 @@ Acht Berichtsseiten im Design Kaldora Dark: sechs Inhaltsseiten und die verborge
 - **Department detail**: die GuV einer Abteilung und ihr EBITDA je Monat, erreichbar per Drillthrough von einem Abteilungsbalken.
 - **Info**: was der Bericht zeigt, die Vorzeichenregel, die Definitionen, die Datendateien und die Quellen.
 
+| P&L statement | Variance analysis |
+|---|---|
+| ![Seite P&L statement mit fünf Kennzahlkacheln gegen Budget und der GuV-Matrix, Revenue und Operating expenses aufgeklappt](docs/screenshots/01-pnl-statement.png) | ![Seite Variance analysis mit den EBIT-Kacheln, der EBITDA-Abweichung je Abteilung, dem Wasserfall vom Budget-EBIT zum Ist-EBIT und der Abweichungsmatrix](docs/screenshots/02-variance-analysis.png) |
+
+| Trend | Opex |
+|---|---|
+| ![Seite Trend mit Ist, Budget und Forecast des EBITDA je Monat und der Tooltip-Seite über einem Monat](docs/screenshots/03-trend.png) | ![Seite Opex mit den Opex-Kacheln, der Treemap nach Untergruppe und Konto, Opex je Abteilung und den größten Abweichungen](docs/screenshots/04-opex.png) |
+
+| Department detail | Info |
+|---|---|
+| ![Seite Department detail nach dem Drillthrough vom Balken Security Services: ihre GuV und ihr EBITDA je Monat](docs/screenshots/05-department-detail.png) | ![Seite Info mit dem Inhalt des Berichts, der Vorzeichenregel, den Definitionen, den Datendateien und den Quellen](docs/screenshots/06-info.png) |
+
+![Die Tooltip-Seite Line tooltip: Actual, Budget (closed), Variance, Variance % und Outlook des Monats unter dem Mauszeiger](docs/screenshots/07-line-tooltip.png)
+
 Das Budget wird nur mit den abgeschlossenen Monaten verglichen, Januar bis September 2025 im Ist also mit Januar bis September im Budget. Full year bedeutet Ist bis zum letzten abgeschlossenen Monat plus Forecast. Innerhalb von 1 % des Budgets (0,1 Prozentpunkte bei einer Marge) gilt eine Zeile als planmäßig.
 
 Abteilungsleitungen sehen nur ihre eigene Abteilung: Die Rolle `Department head` filtert über die Anmeldeadresse und die Tabelle `Security`; eine neue Abteilungsleitung oder eine Leitung für mehrere Abteilungen ist eine neue Zeile in `data/security.csv`, keine Modelländerung.
+
+![P&L statement unter Anzeigen als für die Leitung Operations: Der Slicer Department listet die vier operativen Abteilungen](docs/screenshots/09-rls-head-of-operations.png)
 
 ## So funktioniert es
 
@@ -47,9 +67,13 @@ Abteilungsleitungen sehen nur ihre eigene Abteilung: Die Rolle `Department head`
 
 Der Generator mit festem Startwert schreibt die Dateien des Kundenunternehmens: den Kontensaldenexport, die Budgetarbeitsmappe mit dem Forecast-Blatt und vier CSV-Dateien. Power Query im Power-BI-Projekt liest jede Datei in einer eigenen Staging-Abfrage und entpivotiert die Budgetblätter; Modell und Bericht liegen als Text vor (TMDL und PBIR). Unabhängig davon berechnet `tools/reference.py` die Kennzahlen mit pandas in ganzen Cent. Beide treffen sich im [Abgleich](docs/reconciliation.md): Dreizehn Kennzahlen aus Python und aus Power BI Desktop müssen übereinstimmen. Dieselbe Referenz erzeugt die Daten der Nachbildung. Mehr in [docs/architecture.md](docs/architecture.md).
 
+![Die verborgene Seite Reconciliation in Power BI Desktop: die dreizehn Prüfungen R1 bis R13, die auch die pandas-Referenz berechnet](docs/screenshots/10-reconciliation.png)
+
 ## Datenmodell
 
 `FactGL` enthält Ist, Budget und Forecast in einer Tabelle, eine Zeile je Szenario, Monat, Kostenstelle und Konto, dazu `DimDate`, `DimAccount`, `DimCostCentre`, `DimScenario` und die Schematabelle `DimPnLLine`; die getrennten Tabellen `PnLColumn` (Spalten der Matrix) und `ReconCheck` (der Abgleich), die verborgene Tabelle `Security` für die Sicherheit auf Zeilenebene und 36 Kennzahlen in `_Measures`. Jeder Betrag wird als Beitrag zum Ergebnis gespeichert, Erlöse positiv und Aufwände negativ. Erlös- und Aufwandszeilen erscheinen im Anzeigevorzeichen, Aufwände also als positive Beträge, während Zwischensummen und Margen aus den vorzeichenbehafteten Werten entstehen. Eine Abweichung ist günstig, wenn sie das Ergebnis verbessert, ob die Zeile ein Erlös oder ein Aufwand ist. Tabellen, Spalten und die Regeln des Generators stehen in [docs/data-model.md](docs/data-model.md), jede Kennzahl mit ihrem DAX in [docs/measures.md](docs/measures.md).
+
+![Die Modellansicht in Power BI Desktop: FactGL mit DimDate, DimAccount, DimCostCentre und DimScenario, DimPnLLine neben FactGL und mit DimAccount verbunden, darunter die getrennten Tabellen](docs/screenshots/08-model.png)
 
 ## Erste Schritte
 
@@ -96,12 +120,12 @@ Dieser Nachbau ergänzt:
 - einen schriftlichen Auftrag mit Nutzenden, Umfang und Abnahmekriterien sowie ein dokumentiertes Datenmodell mit dem GuV-Schema als eigener Tabelle;
 - die Vorzeichenregel als Entscheidungsdokument, sodass Erlös- und Aufwandszeilen ihre Abweichungen nach einer Regel einfärben;
 - Modell und Bericht als prüfbaren Text (TMDL und PBIR) mit Offline-Lint-Tests und Schemaprüfungen;
-- dreizehn Prüfwerte unabhängig in Python berechnet und für den Abgleich mit Power BI Desktop aufgelistet, darunter der Umsatz, den eine Abteilungsleitung unter der Rolle sieht;
+- den Abgleich von dreizehn Prüfwerten gegen eine unabhängige pandas-Berechnung, auch des Umsatzes, den eine Abteilungsleitung unter der Rolle sieht;
 - Sicherheit auf Zeilenebene je Abteilung (eine Rolle mit einer Sicherheitstabelle) und ein Skript für die rollenfreie Kopie, die Publish to web braucht;
 - Übergabenotizen zum Monatsabschluss, zu neuen Konten, Kostenstellen und Abteilungsleitungen;
 - CI mit `uv sync --locked` und festgelegten Actions sowie eine Live-Nachbildung mit getesteter GuV-Rechnung.
 
-Die echten Kontensalden und das echte Budget des Kundenunternehmens, der Produktivbetrieb und die Abnahme durch das Kundenunternehmen sind nicht übernommen, und die Validierung in Power BI Desktop steht noch aus (siehe Status).
+Die echten Kontensalden und das echte Budget des Kundenunternehmens, der Produktivbetrieb und die Abnahme durch das Kundenunternehmen sind nicht übernommen; die Validierung in Power BI Desktop ist unter Status und in `docs/reconciliation.md` festgehalten.
 
 ## Lizenz und Hinweis zu den Daten
 
