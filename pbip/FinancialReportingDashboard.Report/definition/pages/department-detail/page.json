@@ -1,16 +1,14 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/2.1.0/schema.json",
-  "annotations": [
-    {
-      "name": "frd:generated",
-      "value": "tools/pbi/pages.json"
-    }
-  ],
+  "name": "department-detail",
   "displayName": "Department detail",
   "displayOption": "FitToPage",
+  "height": 720,
+  "width": 1280,
   "filterConfig": {
     "filters": [
       {
+        "name": "3c223ae689295b948b9d",
         "field": {
           "Column": {
             "Expression": {
@@ -21,19 +19,56 @@
             "Property": "Name"
           }
         },
-        "howCreated": "Drillthrough",
-        "name": "3c223ae689295b948b9d",
-        "type": "Categorical"
+        "type": "Categorical",
+        "filter": {
+          "Version": 2,
+          "From": [
+            {
+              "Name": "d",
+              "Entity": "DimCostCentre",
+              "Type": 0
+            }
+          ],
+          "Where": [
+            {
+              "Condition": {
+                "In": {
+                  "Expressions": [
+                    {
+                      "Column": {
+                        "Expression": {
+                          "SourceRef": {
+                            "Source": "d"
+                          }
+                        },
+                        "Property": "Name"
+                      }
+                    }
+                  ],
+                  "Values": [
+                    [
+                      {
+                        "Literal": {
+                          "Value": "'Security Services'"
+                        }
+                      }
+                    ]
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        "howCreated": "Drillthrough"
       }
     ]
   },
-  "height": 720,
-  "name": "department-detail",
   "pageBinding": {
-    "acceptsFilterContext": "None",
     "name": "92316dcd4a1a581ea312",
+    "type": "Drillthrough",
     "parameters": [
       {
+        "name": "27c0a638ea115c958a3b",
         "boundFilter": "3c223ae689295b948b9d",
         "fieldExpr": {
           "Column": {
@@ -44,13 +79,16 @@
             },
             "Property": "Name"
           }
-        },
-        "name": "27c0a638ea115c958a3b"
+        }
       }
     ],
-    "referenceScope": "Default",
-    "type": "Drillthrough"
+    "acceptsFilterContext": "None"
   },
   "type": "Drillthrough",
-  "width": 1280
+  "annotations": [
+    {
+      "name": "frd:generated",
+      "value": "tools/pbi/pages.json"
+    }
+  ]
 }

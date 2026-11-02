@@ -2,15 +2,47 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
   "name": "8ffe5746150e5999a5d3",
   "position": {
-    "height": 492,
+    "height": 460,
     "tabOrder": 16,
-    "width": 800,
+    "width": 856,
     "x": 16,
-    "y": 212,
+    "y": 244,
     "z": 16
   },
   "visual": {
     "drillFilterOtherVisuals": true,
+    "expansionStates": [
+      {
+        "levels": [
+          {
+            "isCollapsed": true,
+            "isPinned": true,
+            "queryRefs": [
+              "DimPnLLine.Line"
+            ]
+          },
+          {
+            "isCollapsed": true,
+            "isPinned": true,
+            "queryRefs": [
+              "DimAccount.Subgroup"
+            ]
+          },
+          {
+            "isPinned": true,
+            "queryRefs": [
+              "DimAccount.Account label"
+            ]
+          }
+        ],
+        "roles": [
+          "Rows"
+        ],
+        "root": {
+          "isToggled": true
+        }
+      }
+    ],
     "objects": {
       "rowHeaders": [
         {
@@ -42,6 +74,13 @@
                 }
               }
             },
+            "perRowLevel": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
             "rowSubtotals": {
               "expr": {
                 "Literal": {
@@ -56,6 +95,20 @@
                 }
               }
             }
+          }
+        },
+        {
+          "properties": {
+            "levelSubtotalEnabled": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "DimPnLLine.Line"
           }
         }
       ],

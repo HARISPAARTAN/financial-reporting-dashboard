@@ -59,11 +59,11 @@
   },
   "name": "70944f8e19a35b6ea3b7",
   "position": {
-    "height": 36,
+    "height": 88,
     "tabOrder": 10,
-    "width": 240.0,
-    "x": 268.0,
-    "y": 164,
+    "width": 106,
+    "x": 402,
+    "y": 144,
     "z": 10
   },
   "visual": {
@@ -149,7 +149,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Card: Gross margin % vs budget'"
+                  "Value": "'Card: Gross margin vs budget'"
                 }
               }
             }
@@ -169,7 +169,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Gross margin % vs budget'"
+                  "Value": "'Gross margin vs budget'"
                 }
               }
             }

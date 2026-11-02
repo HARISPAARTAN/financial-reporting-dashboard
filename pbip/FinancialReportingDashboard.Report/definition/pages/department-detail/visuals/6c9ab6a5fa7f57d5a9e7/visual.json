@@ -1,16 +1,39 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "6c9ab6a5fa7f57d5a9e7",
   "position": {
-    "height": 48,
-    "tabOrder": 2,
-    "width": 140,
     "x": 16,
     "y": 56,
-    "z": 2
+    "z": 2,
+    "height": 80,
+    "width": 140,
+    "tabOrder": 2
   },
   "visual": {
-    "drillFilterOtherVisuals": true,
+    "visualType": "slicer",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DimDate"
+                    }
+                  },
+                  "Property": "Year"
+                }
+              },
+              "queryRef": "DimDate.Year",
+              "nativeQueryRef": "Year",
+              "active": true
+            }
+          ]
+        }
+      }
+    },
     "objects": {
       "data": [
         {
@@ -30,14 +53,14 @@
           "properties": {
             "filter": {
               "filter": {
+                "Version": 2,
                 "From": [
                   {
-                    "Entity": "DimDate",
                     "Name": "s",
+                    "Entity": "DimDate",
                     "Type": 0
                   }
                 ],
-                "Version": 2,
                 "Where": [
                   {
                     "Condition": {
@@ -108,45 +131,10 @@
                   "Value": "true"
                 }
               }
-            },
-            "strictSingleSelect": {
-              "expr": {
-                "Literal": {
-                  "Value": "true"
-                }
-              }
             }
           }
         }
       ]
-    },
-    "query": {
-      "queryState": {
-        "Values": {
-          "projections": [
-            {
-              "active": true,
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "DimDate"
-                    }
-                  },
-                  "Property": "Year"
-                }
-              },
-              "nativeQueryRef": "Year",
-              "queryRef": "DimDate.Year"
-            }
-          ]
-        }
-      }
-    },
-    "syncGroup": {
-      "fieldChanges": true,
-      "filterChanges": true,
-      "groupName": "Year"
     },
     "visualContainerObjects": {
       "general": [
@@ -183,6 +171,11 @@
         }
       ]
     },
-    "visualType": "slicer"
+    "syncGroup": {
+      "groupName": "Year",
+      "fieldChanges": true,
+      "filterChanges": true
+    },
+    "drillFilterOtherVisuals": true
   }
 }

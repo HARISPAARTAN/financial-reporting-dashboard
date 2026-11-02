@@ -291,7 +291,7 @@ class Visual:
                       field_parameters: dict[str, dict] | None = None, subtitle: str | None = None,
                       title_hidden: bool = False, container: dict | None = None, filters: list[dict] | None = None,
                       tooltip_page: str | None = None, sync_group: str | None = None, selection: dict | None = None,
-                      expand: str | None = None) -> dict:
+                      expand: str | None = None, collapse: str | None = None) -> dict:
         """alt: alt text (None derives one from the title, prefix from project.json; "" leaves none); sort: {"field": [e, p, kind],
         "direction": "Descending"}; top_n: {"field": [e, p], "by": [e, p, aggregation], "n": 10};
         field_parameters: {role: {"parameter": (entity, column), "default": (entity, measure, "Measure")}};
@@ -300,7 +300,8 @@ class Visual:
         on a measure, and basic filters [{"field": [e, column], "in": ["YoY %"]}];
         tooltip_page: the id of a tooltip page shown on hover; sync_group: the slicer sync group;
         selection: a slicer's ticked values {"field": [e, column], "values": [2025]};
-        expand: a role (Rows) whose levels are all expanded, as "Expand all down" leaves them;
+        expand: a role (Rows) whose levels are all expanded, as "Expand all down" leaves them; collapse: a role whose
+        parent levels start collapsed (the +/- icons open them);
         a role field is (entity, property, kind) or (entity, property, kind, display name);
         container: container objects (background, border, dropShadow, visualLink ...) that replace the template's."""
         allowed = ROLES.get(visual_type, QUERY_ONLY.get(visual_type))
@@ -356,17 +357,18 @@ class Visual:
                     objects[key] = items
         if tooltip_page:
             container_objects["visualTooltip"] = [{"properties": {
-                "show": _literal("true"), "type": _literal("'ReportPage'"), "section": _text(tooltip_page)}}]
+                "show": _literal("true"), "type": _literal("'Canvas'"), "section": _text(tooltip_page)}}]
         if sync_group:
             v["visual"]["syncGroup"] = {"groupName": sync_group, "fieldChanges": True, "filterChanges": True}
         if selection:
             general = v["visual"].setdefault("objects", {}).setdefault("general", [{"properties": {}}])
             general[0].setdefault("properties", {})["filter"] = slicer_selection(*selection["field"], selection["values"])
-        if expand:
-            refs = [p["queryRef"] for p in v["visual"]["query"]["queryState"][expand]["projections"]]
+        if expand or collapse:
+            role = expand or collapse
+            refs = [p["queryRef"] for p in v["visual"]["query"]["queryState"][role]["projections"]]
             v["visual"]["expansionStates"] = [{
-                "roles": [expand],
-                "levels": [{"queryRefs": [ref], "isCollapsed": False, "isPinned": True} for ref in refs[:-1]]
+                "roles": [role],
+                "levels": [{"queryRefs": [ref], "isCollapsed": not expand, "isPinned": True} for ref in refs[:-1]]
                 + [{"queryRefs": [refs[-1]], "isPinned": True}],
                 "root": {"isToggled": True},
             }]

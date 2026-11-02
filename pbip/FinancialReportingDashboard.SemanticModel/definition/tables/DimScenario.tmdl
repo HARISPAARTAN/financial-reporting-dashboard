@@ -31,3 +31,4 @@ table DimScenario
 				    Source
 
 	annotation PBI_ResultType = Table
+

@@ -2,7 +2,7 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
   "name": "b8dfaf313cca56edb0bb",
   "position": {
-    "height": 56,
+    "height": 88,
     "tabOrder": 1,
     "width": 148,
     "x": 164,
@@ -75,7 +75,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Card: Budget (closed months)'"
+                  "Value": "'Card: Budget (closed)'"
                 }
               }
             }
@@ -95,7 +95,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Budget (closed months)'"
+                  "Value": "'Budget (closed)'"
                 }
               }
             }

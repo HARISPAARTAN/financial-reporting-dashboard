@@ -1,16 +1,39 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "8f76b0dc20f951829c87",
   "position": {
-    "height": 48,
-    "tabOrder": 5,
-    "width": 300,
     "x": 732,
     "y": 56,
-    "z": 5
+    "z": 5,
+    "height": 80,
+    "width": 300,
+    "tabOrder": 5
   },
   "visual": {
-    "drillFilterOtherVisuals": true,
+    "visualType": "slicer",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DimScenario"
+                    }
+                  },
+                  "Property": "Scenario"
+                }
+              },
+              "queryRef": "DimScenario.Scenario",
+              "nativeQueryRef": "Scenario",
+              "active": true
+            }
+          ]
+        }
+      }
+    },
     "objects": {
       "data": [
         {
@@ -30,14 +53,14 @@
           "properties": {
             "filter": {
               "filter": {
+                "Version": 2,
                 "From": [
                   {
-                    "Entity": "DimScenario",
                     "Name": "s",
+                    "Entity": "DimScenario",
                     "Type": 0
                   }
                 ],
-                "Version": 2,
                 "Where": [
                   {
                     "Condition": {
@@ -115,45 +138,10 @@
                   "Value": "true"
                 }
               }
-            },
-            "strictSingleSelect": {
-              "expr": {
-                "Literal": {
-                  "Value": "true"
-                }
-              }
             }
           }
         }
       ]
-    },
-    "query": {
-      "queryState": {
-        "Values": {
-          "projections": [
-            {
-              "active": true,
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "DimScenario"
-                    }
-                  },
-                  "Property": "Scenario"
-                }
-              },
-              "nativeQueryRef": "Scenario",
-              "queryRef": "DimScenario.Scenario"
-            }
-          ]
-        }
-      }
-    },
-    "syncGroup": {
-      "fieldChanges": true,
-      "filterChanges": true,
-      "groupName": "Scenario"
     },
     "visualContainerObjects": {
       "general": [
@@ -190,6 +178,11 @@
         }
       ]
     },
-    "visualType": "slicer"
+    "syncGroup": {
+      "groupName": "Scenario",
+      "fieldChanges": true,
+      "filterChanges": true
+    },
+    "drillFilterOtherVisuals": true
   }
 }

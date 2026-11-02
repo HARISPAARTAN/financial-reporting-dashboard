@@ -86,3 +86,4 @@ table DimDate
 				    YearMonth
 
 	annotation PBI_ResultType = Table
+

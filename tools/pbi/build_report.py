@@ -229,15 +229,28 @@ def _field_value_rules(spec: dict) -> list[dict]:
     return out
 
 
-def _matrix(spec: dict) -> dict:
-    """Matrix layout: {"stepped": bool, "icons": bool, "subtotals": "Top" | "Bottom" | None}; column subtotals off."""
+def _matrix(spec: dict, first_row: list[str]) -> dict:
+    """Matrix layout: {"stepped": bool, "icons": bool, "subtotals": "Top" | "Bottom" | None}; column subtotals off, and
+    no row grand total (a P&L has no meaningful one): Desktop has no switch for it, it is the subtotal of the first
+    row level, written as per-level subtotals with `levelSubtotalEnabled` false for that level."""
     rows = {"stepped": _lit("true" if spec.get("stepped") else "false")}
     rows["showExpandCollapseButtons"] = _lit("true" if spec.get("icons") else "false")
     subtotals = spec.get("subtotals")
-    totals = {"rowSubtotals": _lit("true" if subtotals else "false"), "columnSubtotals": _lit("false")}
+    totals = {
+        "rowSubtotals": _lit("true" if subtotals else "false"),
+        "columnSubtotals": _lit("false"),
+    }
+    items = [{"properties": totals}]
     if subtotals:
         totals["rowSubtotalsPosition"] = _lit(f"'{subtotals}'")
-    return {"rowHeaders": [{"properties": rows}], "subTotals": [{"properties": totals}]}
+        totals["perRowLevel"] = _lit("true")
+        items.append(
+            {
+                "properties": {"levelSubtotalEnabled": _lit("false")},
+                "selector": {"metadata": f"{first_row[0]}.{first_row[1]}"},
+            }
+        )
+    return {"rowHeaders": [{"properties": rows}], "subTotals": items}
 
 
 def _lines(spec: list[dict], colours: Colours, line_chart: bool) -> dict:
@@ -319,7 +332,7 @@ def _formatting(spec: dict, colours: Colours) -> dict:
         fills = {f"{part}Fill": _solid(colours(spec["sentiment"][part])) for part in ("increase", "decrease", "total")}
         objects["sentimentColors"] = [{"properties": fills}]
     if "matrix" in spec:
-        objects.update(_matrix(spec["matrix"]))
+        objects.update(_matrix(spec["matrix"], roles["Rows"][0]))
     if "lines" in spec:
         objects.update(_lines(spec["lines"], colours, kind in LINE_CHARTS))
     for key, items in spec.get("objects", {}).items():
@@ -408,6 +421,7 @@ def _visual(name: str, spec: dict, colours: Colours, sync_group: str | None = No
         sync_group=sync_group,
         selection=spec.get("selection"),
         expand=spec.get("expand"),
+        collapse=spec.get("collapse"),
     )
 
 
@@ -433,8 +447,9 @@ def _slicer_spec(name: str, slicer: dict, row: dict) -> dict:
 
 
 def tile_specs(page: dict, layout: dict) -> list[tuple[str, dict]]:
-    """(key, card spec) for the KPI row: n tiles across the row width, each a value card and, with a `delta`, the card
-    below it that applies that calculation item to the same measure."""
+    """(key, card spec) for the KPI row: n tiles across the row width, each a value card and, with a `delta` or a
+    `delta_measure`, the card beside it: Desktop's classic card needs about 80 px of height for a title and a value,
+    so the two sit side by side in one row."""
     tiles = page.get("tiles", [])
     if not tiles:
         return []
@@ -447,15 +462,15 @@ def tile_specs(page: dict, layout: dict) -> list[tuple[str, dict]]:
         label = tile.get("label", tile["measure"])
         measure = [layout["measures"], tile["measure"], "Measure"]
         below = tile.get("delta") or tile.get("delta_measure")
-        value_h = layout["value_h"] if below else layout["h"]
+        value_w = round(width * 0.56) if below else width
         value = {
             "type": "card",
             "x": x,
             "y": layout["y"],
-            "w": width,
-            "h": value_h,
+            "w": value_w,
+            "h": layout["h"],
             "title": label,
-            "label_size": 20,
+            "label_size": 16,
             "roles": {"Values": [measure]},
         }
         if tile.get("item"):
@@ -474,10 +489,10 @@ def tile_specs(page: dict, layout: dict) -> list[tuple[str, dict]]:
                 filters = [{"field": [calc_entity, calc_column], "in": [tile["delta"]]}]
             delta = {
                 "type": "card",
-                "x": x,
-                "y": layout["y"] + value_h,
-                "w": width,
-                "h": layout["h"] - value_h,
+                "x": x + value_w,
+                "y": layout["y"],
+                "w": width - value_w,
+                "h": layout["h"],
                 "title": f"{label} {layout['delta_label']}",
                 "title_hidden": True,
                 "label_size": 11,
@@ -672,7 +687,8 @@ def _bookmark_json(page: dict, spec: dict, visuals: list[dict]) -> dict:
         slicer = spec["slicers"][name]
         vname = stable_name(pid, "slicer", name)
         if slicer.get("default"):
-            objects = {"merge": {"general": [{"properties": slicer_selection(*slicer["field"], slicer["default"])}]}}
+            selection = slicer_selection(*slicer["field"], slicer["default"])
+            objects = {"merge": {"general": [{"properties": {"filter": selection}}]}}
         else:
             objects = {"remove": [{"object": "general", "property": "filter"}]}
         states[vname] = {"singleVisual": {"visualType": "slicer", "objects": objects}}

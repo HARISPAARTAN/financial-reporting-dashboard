@@ -200,7 +200,7 @@ DEFINITIONS = {  # spec section 7, flattened
     "Personnel cost % of revenue": "DIVIDE([Personnel cost], [Revenue])",
     "Rows": "COUNTROWS(FactGL)",
     "Selected department": 'SELECTEDVALUE(DimCostCentre[Name], "All departments")',
-    "Department head": "SELECTEDVALUE(DimCostCentre[Head name])",
+    "Department head": 'SELECTEDVALUE(DimCostCentre[Head name], "")',
 }
 ROLE = {
     "Security": "Security[User email] = LOWER(USERPRINCIPALNAME())",

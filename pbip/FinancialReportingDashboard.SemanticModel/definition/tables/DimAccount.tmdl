@@ -113,3 +113,4 @@ table DimAccount
 				    Result
 
 	annotation PBI_ResultType = Table
+

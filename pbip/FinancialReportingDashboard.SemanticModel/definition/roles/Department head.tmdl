@@ -5,3 +5,6 @@ role 'Department head'
 	tablePermission Security = Security[User email] = LOWER(USERPRINCIPALNAME())
 
 	tablePermission DimCostCentre = DimCostCentre[Cost centre] IN CALCULATETABLE(VALUES(Security[Cost centre]), Security[User email] = LOWER(USERPRINCIPALNAME()))
+
+	annotation PBI_Id = 3dc925f48fc44f5ba0cd30b4d926be60
+

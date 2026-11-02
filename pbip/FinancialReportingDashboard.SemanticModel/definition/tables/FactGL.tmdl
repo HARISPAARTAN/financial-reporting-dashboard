@@ -66,3 +66,4 @@ table FactGL
 				    Result
 
 	annotation PBI_ResultType = Table
+

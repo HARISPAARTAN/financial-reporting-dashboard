@@ -17,3 +17,4 @@ relationship factgl-dimscenario
 relationship dimaccount-dimpnlline
 	fromColumn: DimAccount.'Line key'
 	toColumn: DimPnLLine.'Line key'
+

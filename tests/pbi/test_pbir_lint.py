@@ -41,7 +41,7 @@ SLICERS = {
 FOOTER = "Rebuilt from memory as a demo. The original client's name and data are not used."
 SLICER_ROW = (SPEC["slicer_row"]["y"], SPEC["slicer_row"]["y"] + SPEC["slicer_row"]["h"])
 TILE_ROW = (SPEC["tiles"]["y"], SPEC["tiles"]["y"] + SPEC["tiles"]["h"])
-CONTENT_TOP = 212
+CONTENT_TOP = 244
 FAVOURABLE = ("_Measures", "Favourable colour", "Measure")
 TINT = ("_Measures", "Row tint", "Measure")
 
@@ -200,6 +200,14 @@ def reset_problems(report):
         slicers = {v.name for v in pg.visuals if v.visual_type == "slicer"}
         if not slicers <= targets:
             out.append(f"{pg.display_name}: bookmark misses slicers {sorted(slicers - targets)}")
+    for bookmark in report.bookmarks:
+        for section in bookmark["explorationState"]["sections"].values():
+            for name, state in section["visualContainers"].items():
+                merge = state["singleVisual"].get("objects", {}).get("merge", {}).get("general", [])
+                for item in merge:
+                    # the shape of a slicer's own general.filter; Desktop drops any other shape when it saves
+                    if "filter" not in item["properties"].get("filter", {}):
+                        out.append(f"{bookmark['name']}: slicer {name} has no filter.filter selection")
     if report.bookmark_groups != {
         "Reset filters": [bookmark_name(p.name) for p in report.pages if p.display_name in RESET_PAGES]
     }:
@@ -208,12 +216,12 @@ def reset_problems(report):
 
 
 def special_page_problems(report):
-    """Line tooltip: a hidden 320 x 200 tooltip page; Department detail: drill-through on the department name;
+    """Line tooltip: a hidden 320 x 296 tooltip page; Department detail: drill-through on the department name;
     Reconciliation: hidden in view mode; the bar chart and the monthly trend show the tooltip page."""
     out = []
     tip = page(report, "Line tooltip")
-    if (tip.page_type, tip.visibility, tip.width, tip.height) != ("Tooltip", "HiddenInViewMode", 320, 200):
-        out.append("the tooltip page is not a hidden 320 x 200 tooltip page")
+    if (tip.page_type, tip.visibility, tip.width, tip.height) != ("Tooltip", "HiddenInViewMode", 320, 296):
+        out.append("the tooltip page is not a hidden 320 x 296 tooltip page")
     detail = page(report, "Department detail")
     binding = detail.raw.get("pageBinding") or {}
     filters = detail.raw.get("filterConfig", {}).get("filters", [])
@@ -233,7 +241,7 @@ def special_page_problems(report):
         v = visual(report, page_name, key)
         props = v.raw["visual"]["visualContainerObjects"].get("visualTooltip", [{}])[0].get("properties", {})
         kind = lit(props["type"]) if "type" in props else None
-        if kind != "'ReportPage'" or lit(props["section"]).strip("'") != tip.name:
+        if kind != "'Canvas'" or lit(props["section"]).strip("'") != tip.name:
             out.append(f"{page_name} {key}: no report-page tooltip {tip.name!r}")
     return out
 
@@ -324,7 +332,7 @@ def test_eight_pages_in_order_sizes_and_types(report):
     assert [p.name for p in report.pages] == [p["id"] for p in SPEC["pages"]]
     types = {"Department detail": "Drillthrough", "Line tooltip": "Tooltip"}
     for pg in report.pages:
-        size = (320, 200) if pg.display_name == "Line tooltip" else (1280, 720)
+        size = (320, 296) if pg.display_name == "Line tooltip" else (1280, 720)
         assert ((pg.width, pg.height), pg.page_type) == (size, types.get(pg.display_name)), pg.display_name
 
 
@@ -394,7 +402,7 @@ def test_reset_buttons_target_their_page_bookmark(report):
 
 def test_reset_bookmarks_restore_the_default_state(report):
     def values(state):
-        where = state["singleVisual"]["objects"]["merge"]["general"][0]["properties"]["filter"]["Where"]
+        where = state["singleVisual"]["objects"]["merge"]["general"][0]["properties"]["filter"]["filter"]["Where"]
         return [w["Literal"]["Value"] for row in where[0]["Condition"]["In"]["Values"] for w in row]
 
     removed = {"remove": [{"object": "general", "property": "filter"}]}
@@ -411,7 +419,9 @@ def test_reset_bookmarks_restore_the_default_state(report):
         for index, spec in enumerate(SPEC_PAGES[pid].get("visuals", [])):
             if spec.get("reset") == "collapse":
                 state = states[content_name(pid, index, spec)]["singleVisual"]
-                assert state == {"visualType": "pivotTable", "expansionStates": []}, pid
+                # generated with an empty expansion state; Desktop drops the empty list when it saves, and Reset
+                # still collapses the matrix from the saved form (checked in Desktop)
+                assert state.get("expansionStates", []) == [] and state["visualType"] == "pivotTable", pid
     assert len(report.bookmarks) == 5
 
 
@@ -441,7 +451,15 @@ def test_visuals_bind_what_section_6_says(report):
     matrix = visual(report, "P&L statement", "matrix").raw["visual"]
     assert lit(matrix["objects"]["rowHeaders"][0]["properties"]["stepped"]) == "true"
     assert lit(matrix["objects"]["subTotals"][0]["properties"]["rowSubtotalsPosition"]) == "'Top'"
-    assert "expansionStates" not in matrix  # collapsed by default
+    # Desktop expands every row level of a matrix unless the expansion state says otherwise, so the two parent
+    # levels are marked collapsed and the account level is left to the +/- icons
+    levels = matrix["expansionStates"][0]["levels"]
+    assert [level.get("isCollapsed") for level in levels] == [True, True, None]
+    # no row grand total: Desktop writes it as the subtotal of the first row level, switched off
+    totals = matrix["objects"]["subTotals"]
+    assert lit(totals[0]["properties"]["perRowLevel"]) == "true"
+    assert totals[1]["selector"] == {"metadata": "DimPnLLine.Line"}
+    assert lit(totals[1]["properties"]["levelSubtotalEnabled"]) == "false"
     assert roles("Variance analysis", "waterfall") == {
         "Category": [("DimPnLLine", "Line")],
         "Y": [("_Measures", "Profit impact")],

@@ -1,73 +1,74 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
-  "filterConfig": {
-    "filters": [
-      {
-        "field": {
-          "Column": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "DimPnLLine"
-              }
-            },
-            "Property": "Line key"
-          }
-        },
-        "filter": {
-          "From": [
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "f82d5a4ba5425a4b9424",
+  "position": {
+    "x": 16,
+    "y": 244,
+    "z": 11,
+    "height": 240,
+    "width": 440,
+    "tabOrder": 11
+  },
+  "visual": {
+    "visualType": "clusteredBarChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
             {
-              "Entity": "DimPnLLine",
-              "Name": "f0",
-              "Type": 0
-            }
-          ],
-          "Version": 2,
-          "Where": [
-            {
-              "Condition": {
-                "In": {
-                  "Expressions": [
-                    {
-                      "Column": {
-                        "Expression": {
-                          "SourceRef": {
-                            "Source": "f0"
-                          }
-                        },
-                        "Property": "Line key"
-                      }
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DimCostCentre"
                     }
-                  ],
-                  "Values": [
-                    [
-                      {
-                        "Literal": {
-                          "Value": "'EBITDA'"
-                        }
-                      }
-                    ]
-                  ]
+                  },
+                  "Property": "Name"
                 }
-              }
+              },
+              "queryRef": "DimCostCentre.Name",
+              "nativeQueryRef": "Name",
+              "active": true
             }
           ]
         },
-        "name": "e61acfaf92415439860f",
-        "type": "Categorical"
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Profit impact"
+                }
+              },
+              "queryRef": "_Measures.Profit impact",
+              "nativeQueryRef": "Profit impact"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "DimCostCentre"
+                  }
+                },
+                "Property": "Name"
+              }
+            },
+            "direction": "Ascending"
+          }
+        ]
       }
-    ]
-  },
-  "name": "f82d5a4ba5425a4b9424",
-  "position": {
-    "height": 240,
-    "tabOrder": 11,
-    "width": 500,
-    "x": 16,
-    "y": 212,
-    "z": 11
-  },
-  "visual": {
-    "drillFilterOtherVisuals": true,
+    },
     "objects": {
       "categoryAxis": [
         {
@@ -209,64 +210,6 @@
         }
       ]
     },
-    "query": {
-      "queryState": {
-        "Category": {
-          "projections": [
-            {
-              "active": true,
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "DimCostCentre"
-                    }
-                  },
-                  "Property": "Name"
-                }
-              },
-              "nativeQueryRef": "Name",
-              "queryRef": "DimCostCentre.Name"
-            }
-          ]
-        },
-        "Y": {
-          "projections": [
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "_Measures"
-                    }
-                  },
-                  "Property": "Profit impact"
-                }
-              },
-              "nativeQueryRef": "Profit impact",
-              "queryRef": "_Measures.Profit impact"
-            }
-          ]
-        }
-      },
-      "sortDefinition": {
-        "sort": [
-          {
-            "direction": "Ascending",
-            "field": {
-              "Column": {
-                "Expression": {
-                  "SourceRef": {
-                    "Entity": "DimCostCentre"
-                  }
-                },
-                "Property": "Name"
-              }
-            }
-          }
-        ]
-      }
-    },
     "visualContainerObjects": {
       "general": [
         {
@@ -321,7 +264,7 @@
             "type": {
               "expr": {
                 "Literal": {
-                  "Value": "'ReportPage'"
+                  "Value": "'Canvas'"
                 }
               }
             }
@@ -329,6 +272,92 @@
         }
       ]
     },
-    "visualType": "clusteredBarChart"
+    "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "e61acfaf92415439860f",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "DimPnLLine"
+              }
+            },
+            "Property": "Line key"
+          }
+        },
+        "type": "Categorical",
+        "filter": {
+          "Version": 2,
+          "From": [
+            {
+              "Name": "f0",
+              "Entity": "DimPnLLine",
+              "Type": 0
+            }
+          ],
+          "Where": [
+            {
+              "Condition": {
+                "In": {
+                  "Expressions": [
+                    {
+                      "Column": {
+                        "Expression": {
+                          "SourceRef": {
+                            "Source": "f0"
+                          }
+                        },
+                        "Property": "Line key"
+                      }
+                    }
+                  ],
+                  "Values": [
+                    [
+                      {
+                        "Literal": {
+                          "Value": "'EBITDA'"
+                        }
+                      }
+                    ]
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        "howCreated": "User"
+      },
+      {
+        "name": "84d43f12970105cab2e7",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "DimCostCentre"
+              }
+            },
+            "Property": "Name"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "4a0d94131092d7904228",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "_Measures"
+              }
+            },
+            "Property": "Profit impact"
+          }
+        },
+        "type": "Advanced"
+      }
+    ]
   }
 }

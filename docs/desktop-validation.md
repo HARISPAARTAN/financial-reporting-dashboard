@@ -44,7 +44,7 @@ Some formatting objects are written from the published schemas but only Desktop 
 | Check | Expected | Fallback in Desktop |
 |---|---|---|
 | Amounts | EUR thousand without a unit suffix (`33,883`, negatives in parentheses), margins as `21.1 %` | Format, the visual's values or callout, Display units None |
-| P&L matrix (P&L statement) | stepped layout, + and - icons, the ten lines collapsed, subtotals of subgroups above their accounts, no grand total row or column | Format, Row headers, +/- icons on; Layout Stepped; Subtotals, Row subtotals position Top; Grand total, Rows and Columns off |
+| P&L matrix (P&L statement) | stepped layout, + and - icons, the ten lines collapsed, subtotals of subgroups above their accounts, no grand total row or column | Format, Row headers, +/- icons on; Layout Stepped; Row subtotals, Position Top, Per row level on, Row level Line, Show subtotal off; Column subtotals off |
 | Row tint | Gross profit, the margins, EBITDA and EBIT on the tinted background, the group lines on the surface | Format, Cell elements, Background color, fx, Field value, `Row tint` |
 | Variance colours | `Variance`, `Variance %` and `Status` in the ok colour when favourable, the warning colour when unfavourable, muted on plan (Variance analysis, Opex, Department detail) | Format, Cell elements, Font color, fx, Field value, `Favourable colour` |
 | KPI deltas | the `vs budget` card under each value card, its text in the favourable colour, nothing cut off | Format, Callout value, Color, fx, Field value, `Favourable colour`; resize the two cards inside the tile |

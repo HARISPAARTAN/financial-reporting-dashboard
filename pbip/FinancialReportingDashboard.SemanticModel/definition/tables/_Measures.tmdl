@@ -287,7 +287,7 @@ table _Measures
 		lineageTag: 5ce3b6a9-fd02-5cbe-b935-d20d055c0923
 
 	/// Head of the department in context; blank for several.
-	measure 'Department head' = SELECTEDVALUE(DimCostCentre[Head name])
+	measure 'Department head' = SELECTEDVALUE(DimCostCentre[Head name], "")
 		displayFolder: Info
 		lineageTag: 68d9b08e-c059-5bd2-b9c0-a4e1a4366c76
 
@@ -332,3 +332,4 @@ table _Measures
 	partition _Measures = calculated
 		mode: import
 		source = {BLANK()}
+

@@ -59,11 +59,11 @@
   },
   "name": "2419c2bdf206548183a7",
   "position": {
-    "height": 36,
+    "height": 88,
     "tabOrder": 14,
-    "width": 240.0,
-    "x": 772.0,
-    "y": 164,
+    "width": 106,
+    "x": 906,
+    "y": 144,
     "z": 14
   },
   "visual": {
@@ -149,7 +149,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Card: EBITDA margin % vs budget'"
+                  "Value": "'Card: EBITDA margin vs budget'"
                 }
               }
             }
@@ -169,7 +169,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'EBITDA margin % vs budget'"
+                  "Value": "'EBITDA margin vs budget'"
                 }
               }
             }

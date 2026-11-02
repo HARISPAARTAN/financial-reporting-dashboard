@@ -1,116 +1,6 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/bookmark/2.1.0/schema.json",
   "displayName": "Reset Variance analysis",
-  "explorationState": {
-    "activeSection": "variance-analysis",
-    "objects": {},
-    "sections": {
-      "variance-analysis": {
-        "visualContainers": {
-          "0b2e7f8af09450c48182": {
-            "singleVisual": {
-              "objects": {
-                "remove": [
-                  {
-                    "object": "general",
-                    "property": "filter"
-                  }
-                ]
-              },
-              "visualType": "slicer"
-            }
-          },
-          "21df9c1a91d35c53b5e1": {
-            "singleVisual": {
-              "objects": {
-                "remove": [
-                  {
-                    "object": "general",
-                    "property": "filter"
-                  }
-                ]
-              },
-              "visualType": "slicer"
-            }
-          },
-          "75fc7e72f08e59198daa": {
-            "singleVisual": {
-              "expansionStates": [],
-              "visualType": "pivotTable"
-            }
-          },
-          "d3d4a067a10c5ef380f5": {
-            "singleVisual": {
-              "objects": {
-                "merge": {
-                  "general": [
-                    {
-                      "properties": {
-                        "filter": {
-                          "From": [
-                            {
-                              "Entity": "DimDate",
-                              "Name": "s",
-                              "Type": 0
-                            }
-                          ],
-                          "Version": 2,
-                          "Where": [
-                            {
-                              "Condition": {
-                                "In": {
-                                  "Expressions": [
-                                    {
-                                      "Column": {
-                                        "Expression": {
-                                          "SourceRef": {
-                                            "Source": "s"
-                                          }
-                                        },
-                                        "Property": "Year"
-                                      }
-                                    }
-                                  ],
-                                  "Values": [
-                                    [
-                                      {
-                                        "Literal": {
-                                          "Value": "2025L"
-                                        }
-                                      }
-                                    ]
-                                  ]
-                                }
-                              }
-                            }
-                          ]
-                        }
-                      }
-                    }
-                  ]
-                }
-              },
-              "visualType": "slicer"
-            }
-          },
-          "f82d5a4ba5425a4b9424": {
-            "singleVisual": {
-              "objects": {
-                "remove": [
-                  {
-                    "object": "general",
-                    "property": "filter"
-                  }
-                ]
-              },
-              "visualType": "clusteredBarChart"
-            }
-          }
-        }
-      }
-    },
-    "version": "1.3"
-  },
   "name": "68d14d33819351da9b0c",
   "options": {
     "applyOnlyToTargetVisuals": true,
@@ -121,5 +11,116 @@
       "d3d4a067a10c5ef380f5",
       "f82d5a4ba5425a4b9424"
     ]
+  },
+  "explorationState": {
+    "version": "1.3",
+    "activeSection": "variance-analysis",
+    "sections": {
+      "variance-analysis": {
+        "visualContainers": {
+          "0b2e7f8af09450c48182": {
+            "singleVisual": {
+              "visualType": "slicer",
+              "objects": {
+                "remove": [
+                  {
+                    "object": "general",
+                    "property": "filter"
+                  }
+                ]
+              }
+            }
+          },
+          "21df9c1a91d35c53b5e1": {
+            "singleVisual": {
+              "visualType": "slicer",
+              "objects": {
+                "remove": [
+                  {
+                    "object": "general",
+                    "property": "filter"
+                  }
+                ]
+              }
+            }
+          },
+          "75fc7e72f08e59198daa": {
+            "singleVisual": {
+              "visualType": "pivotTable"
+            }
+          },
+          "d3d4a067a10c5ef380f5": {
+            "singleVisual": {
+              "visualType": "slicer",
+              "objects": {
+                "merge": {
+                  "general": [
+                    {
+                      "properties": {
+                        "filter": {
+                          "filter": {
+                            "Version": 2,
+                            "From": [
+                              {
+                                "Name": "s",
+                                "Entity": "DimDate",
+                                "Type": 0
+                              }
+                            ],
+                            "Where": [
+                              {
+                                "Condition": {
+                                  "In": {
+                                    "Expressions": [
+                                      {
+                                        "Column": {
+                                          "Expression": {
+                                            "SourceRef": {
+                                              "Source": "s"
+                                            }
+                                          },
+                                          "Property": "Year"
+                                        }
+                                      }
+                                    ],
+                                    "Values": [
+                                      [
+                                        {
+                                          "Literal": {
+                                            "Value": "2025L"
+                                          }
+                                        }
+                                      ]
+                                    ]
+                                  }
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "f82d5a4ba5425a4b9424": {
+            "singleVisual": {
+              "visualType": "clusteredBarChart",
+              "objects": {
+                "remove": [
+                  {
+                    "object": "general",
+                    "property": "filter"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "objects": {}
   }
 }

@@ -28,43 +28,45 @@
                     {
                       "properties": {
                         "filter": {
-                          "From": [
-                            {
-                              "Entity": "DimPnLLine",
-                              "Name": "s",
-                              "Type": 0
-                            }
-                          ],
-                          "Version": 2,
-                          "Where": [
-                            {
-                              "Condition": {
-                                "In": {
-                                  "Expressions": [
-                                    {
-                                      "Column": {
-                                        "Expression": {
-                                          "SourceRef": {
-                                            "Source": "s"
-                                          }
-                                        },
-                                        "Property": "Line"
-                                      }
-                                    }
-                                  ],
-                                  "Values": [
-                                    [
+                          "filter": {
+                            "From": [
+                              {
+                                "Entity": "DimPnLLine",
+                                "Name": "s",
+                                "Type": 0
+                              }
+                            ],
+                            "Version": 2,
+                            "Where": [
+                              {
+                                "Condition": {
+                                  "In": {
+                                    "Expressions": [
                                       {
-                                        "Literal": {
-                                          "Value": "'EBITDA'"
+                                        "Column": {
+                                          "Expression": {
+                                            "SourceRef": {
+                                              "Source": "s"
+                                            }
+                                          },
+                                          "Property": "Line"
                                         }
                                       }
+                                    ],
+                                    "Values": [
+                                      [
+                                        {
+                                          "Literal": {
+                                            "Value": "'EBITDA'"
+                                          }
+                                        }
+                                      ]
                                     ]
-                                  ]
+                                  }
                                 }
                               }
-                            }
-                          ]
+                            ]
+                          }
                         }
                       }
                     }

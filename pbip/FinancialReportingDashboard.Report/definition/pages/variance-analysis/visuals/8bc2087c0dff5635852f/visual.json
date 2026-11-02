@@ -1,73 +1,74 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
-  "filterConfig": {
-    "filters": [
-      {
-        "field": {
-          "Column": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "DimPnLLine"
-              }
-            },
-            "Property": "Line type"
-          }
-        },
-        "filter": {
-          "From": [
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "8bc2087c0dff5635852f",
+  "position": {
+    "x": 16,
+    "y": 496,
+    "z": 12,
+    "height": 208,
+    "width": 440,
+    "tabOrder": 12
+  },
+  "visual": {
+    "visualType": "waterfallChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
             {
-              "Entity": "DimPnLLine",
-              "Name": "f0",
-              "Type": 0
-            }
-          ],
-          "Version": 2,
-          "Where": [
-            {
-              "Condition": {
-                "In": {
-                  "Expressions": [
-                    {
-                      "Column": {
-                        "Expression": {
-                          "SourceRef": {
-                            "Source": "f0"
-                          }
-                        },
-                        "Property": "Line type"
-                      }
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DimPnLLine"
                     }
-                  ],
-                  "Values": [
-                    [
-                      {
-                        "Literal": {
-                          "Value": "'Group'"
-                        }
-                      }
-                    ]
-                  ]
+                  },
+                  "Property": "Line"
                 }
-              }
+              },
+              "queryRef": "DimPnLLine.Line",
+              "nativeQueryRef": "Line",
+              "active": true
             }
           ]
         },
-        "name": "1dd244332b52500598b7",
-        "type": "Categorical"
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Profit impact"
+                }
+              },
+              "queryRef": "_Measures.Profit impact",
+              "nativeQueryRef": "Profit impact"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "DimPnLLine"
+                  }
+                },
+                "Property": "Line"
+              }
+            },
+            "direction": "Ascending"
+          }
+        ]
       }
-    ]
-  },
-  "name": "8bc2087c0dff5635852f",
-  "position": {
-    "height": 240,
-    "tabOrder": 12,
-    "width": 500,
-    "x": 16,
-    "y": 464,
-    "z": 12
-  },
-  "visual": {
-    "drillFilterOtherVisuals": true,
+    },
     "objects": {
       "labels": [
         {
@@ -122,64 +123,6 @@
         }
       ]
     },
-    "query": {
-      "queryState": {
-        "Category": {
-          "projections": [
-            {
-              "active": true,
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "DimPnLLine"
-                    }
-                  },
-                  "Property": "Line"
-                }
-              },
-              "nativeQueryRef": "Line",
-              "queryRef": "DimPnLLine.Line"
-            }
-          ]
-        },
-        "Y": {
-          "projections": [
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "_Measures"
-                    }
-                  },
-                  "Property": "Profit impact"
-                }
-              },
-              "nativeQueryRef": "Profit impact",
-              "queryRef": "_Measures.Profit impact"
-            }
-          ]
-        }
-      },
-      "sortDefinition": {
-        "sort": [
-          {
-            "direction": "Ascending",
-            "field": {
-              "Column": {
-                "Expression": {
-                  "SourceRef": {
-                    "Entity": "DimPnLLine"
-                  }
-                },
-                "Property": "Line"
-              }
-            }
-          }
-        ]
-      }
-    },
     "visualContainerObjects": {
       "general": [
         {
@@ -215,6 +158,92 @@
         }
       ]
     },
-    "visualType": "waterfallChart"
+    "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "1dd244332b52500598b7",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "DimPnLLine"
+              }
+            },
+            "Property": "Line type"
+          }
+        },
+        "type": "Categorical",
+        "filter": {
+          "Version": 2,
+          "From": [
+            {
+              "Name": "f0",
+              "Entity": "DimPnLLine",
+              "Type": 0
+            }
+          ],
+          "Where": [
+            {
+              "Condition": {
+                "In": {
+                  "Expressions": [
+                    {
+                      "Column": {
+                        "Expression": {
+                          "SourceRef": {
+                            "Source": "f0"
+                          }
+                        },
+                        "Property": "Line type"
+                      }
+                    }
+                  ],
+                  "Values": [
+                    [
+                      {
+                        "Literal": {
+                          "Value": "'Group'"
+                        }
+                      }
+                    ]
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        "howCreated": "User"
+      },
+      {
+        "name": "12ab4fe42db2d8661280",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "DimPnLLine"
+              }
+            },
+            "Property": "Line"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "7069ccd0cceb368ae300",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "_Measures"
+              }
+            },
+            "Property": "Profit impact"
+          }
+        },
+        "type": "Advanced"
+      }
+    ]
   }
 }

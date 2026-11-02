@@ -431,7 +431,7 @@ Folder `Info` · text.
 Head of the department in context; blank for several.
 
 ```dax
-SELECTEDVALUE(DimCostCentre[Head name])
+SELECTEDVALUE(DimCostCentre[Head name], "")
 ```
 
 Folder `Info` · text.

@@ -33,3 +33,4 @@ table PnLColumn
 				    Source
 
 	annotation PBI_ResultType = Table
+
